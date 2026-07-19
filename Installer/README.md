@@ -1,88 +1,60 @@
-# OESDK Online Installer 0.0.3
+# OESDK Online Installer and SDK Packages 0.0.4
 
-This is the small Windows bootstrap installer for OESDK. It does not require a
-separate OESDK download domain. The package manifest is fetched directly from
-the ProjectLithos GitHub repository:
+This source tree builds the small OESDK Windows bootstrapper and the first
+downloadable SDK package set. The installer reads its manifest directly from:
 
 ```text
 https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.json
 ```
 
-Large SDK, architecture, QEMU and Visual Studio integration ZIP files should be
-published as assets on the GitHub release named `v0.0.3`. This keeps the setup
-executable small and avoids storing large binaries in the Git repository.
+## Included packages
 
-## Current behaviour
+- **Core**: freestanding C headers, a small libc, VGA console, formatting,
+  DEBUG-only COM1 output, runtime startup, and framebuffer drawing primitives.
+- **x86-64**: QEMU-compatible Multiboot entry point, 64-bit paging, linker script,
+  `Build-Kernel.ps1`, and `Run-Qemu.ps1`.
+- **QEMU**: automatic QEMU installation through Windows Package Manager and
+  machine-wide `OESDK_QEMU` configuration.
+- **Visual Studio**: a VSIX containing **OESDK Freestanding Kernel** and
+  **OESDK Desktop GUI OS** project templates.
 
-1. Requests administrator privileges through the normal Windows UAC dialog.
-2. Downloads the real `Installer/manifest.json` file from GitHub.
-3. Stops with a clear message when the SDK release assets are not published.
-4. Once the manifest is marked `ready`, detects complete Visual Studio
-   Community, Professional and Enterprise installations.
-5. If no full Visual Studio edition exists, downloads Microsoft's validly
-   signed Visual Studio Community bootstrapper.
-6. Adds the native C/C++ and Clang/LLVM components to the selected edition.
-7. Downloads only the packages listed by the manifest.
-8. Verifies every package using SHA-256 before extraction.
-9. Rejects package destinations that escape the staging directory.
-10. Installs the SDK to `C:\OESDK` by default and sets machine-wide
-    `OESDK_ROOT`.
-11. Installs the OESDK VSIX when the manifest specifies one.
-12. Deletes temporary downloads and writes failures to
-    `%TEMP%\OESDK-Setup.log`.
+The generated package archives live in `ReleaseAssets`. They are downloaded
+separately, keeping `OESDK-Setup-0.0.4-x64.exe` small.
 
-The checked-in `manifest.json` intentionally has `releaseStatus` set to
-`not-published`. This prevents the installer from downloading Visual Studio or
-claiming success before the actual SDK packages exist.
+## User experience
 
-## Publishing the SDK packages
+1. Run the setup executable and approve Windows UAC.
+2. The installer downloads and SHA-256 verifies the four packages.
+3. If no full Visual Studio edition exists, it downloads Visual Studio 2022
+   Community from Microsoft.
+4. It adds the native C/C++ and Clang/LLVM components.
+5. It installs QEMU through `winget` when QEMU is absent.
+6. It installs the OESDK VSIX.
+7. In Visual Studio, select an OESDK template, build it, and use **Start Without
+   Debugging** to launch the resulting `kernel.elf` in QEMU.
 
-1. Build these four ZIP files:
+Debug configurations define `DEBUG`, so `kdebugf(...)` is compiled in and sent
+to COM1. Release configurations omit it. `kprintf(...)` always targets the VGA
+text screen.
 
-   - `OESDK-Core-0.0.3.zip`
-   - `OESDK-x86_64-0.0.3.zip`
-   - `OESDK-QEMU-x86_64.zip`
-   - `OESDK-VisualStudio-0.0.3.zip`
+## Building everything
 
-2. Create GitHub release `v0.0.3` in `ProjectLithos/Lithos` and upload them as
-   release assets.
-3. Calculate each file's SHA-256 value on Windows:
-
-   ```powershell
-   Get-FileHash -Algorithm SHA256 .\OESDK-Core-0.0.3.zip
-   ```
-
-4. Copy `manifest.example.json` to `manifest.json`, replace every placeholder
-   hash with its real 64-character value, and run `updater.bat` again.
-
-## Files
-
-- `OESDK-Setup-0.0.3-x64.exe` — small Windows x64 online installer.
-- `OESDK-Setup-0.0.3-x64.sha256` — installer checksum.
-- `manifest.json` — stable GitHub manifest endpoint and publication state.
-- `manifest.example.json` — completed release manifest template.
-- `Source/Installer.ps1` — installer interface and download logic.
-- `Source/BuildBootstrapper.py` — deterministic native PE launcher builder.
-- `Tests/VerifyBootstrapper.py` — static bootstrapper verification.
-
-## Security status
-
-Package contents are SHA-256 verified. The bootstrapper is not Authenticode
-signed because no OESDK code-signing certificate has been supplied. Windows
-will therefore identify this build as coming from an unknown publisher.
-
-The production manifest should additionally be digitally signed. SHA-256
-protects packages against accidental or malicious modification relative to the
-manifest, but does not by itself authenticate the manifest publisher.
-
-## Rebuilding
-
-Run with Python 3 from the installer directory:
+From this directory:
 
 ```text
+python Tools/BuildPackages.py
 python Source/BuildBootstrapper.py
+python Tests/VerifyBootstrapper.py
 ```
 
-The builder creates a native Windows PE executable which launches the embedded
-installer interface with administrator rights. It does not bundle the SDK
-payload.
+Run `Tools/BuildPackages.py` once more after editing package sources so the
+source ZIP contains the updated release assets and manifest.
+
+## Current limitations
+
+- The runtime is a starter SDK, not a complete ISO/UEFI boot stack.
+- The QEMU automation requires Windows Package Manager (`winget`) if QEMU is
+  not already installed.
+- The installer and VSIX are not Authenticode signed because no Project Lithos
+  code-signing certificate has been supplied.
+- The manifest is SHA-256 protected but is not yet digitally signed.

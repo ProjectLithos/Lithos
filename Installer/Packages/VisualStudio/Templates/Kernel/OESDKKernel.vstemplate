@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>OESDK Freestanding Kernel</Name>
+    <Description>A native x86-64 freestanding kernel built with Clang C and run with QEMU.</Description>
+    <ProjectType>VC</ProjectType>
+    <DefaultName>LithosKernel</DefaultName>
+    <SortOrder>10</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <TemplateID>ProjectLithos.OESDK.Kernel.C</TemplateID>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="OESDKKernel.vcxproj" TargetFileName="$safeprojectname$.vcxproj" ReplaceParameters="true">
+      <Folder Name="Source" TargetFolderName="Source">
+        <ProjectItem ReplaceParameters="true" TargetFileName="kmain.c">kmain.c</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="false" TargetFileName="README.md">README.md</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

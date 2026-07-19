@@ -52,6 +52,24 @@ function Get-SafeDestination {
     return $targetPath
 }
 
+function Expand-SafeArchive {
+    param([string]$ArchivePath, [string]$Destination)
+    $root = [IO.Path]::GetFullPath($Destination).TrimEnd('\') + '\'
+    $archive = $null
+    try {
+        $archive = [IO.Compression.ZipFile]::OpenRead($ArchivePath)
+        foreach ($entry in $archive.Entries) {
+            $entryPath = [IO.Path]::GetFullPath((Join-Path $Destination $entry.FullName))
+            if (-not ($entryPath + '\').StartsWith($root, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Unsafe path in package archive: $($entry.FullName)"
+            }
+        }
+    } finally {
+        if ($null -ne $archive) { $archive.Dispose() }
+    }
+    [IO.Compression.ZipFile]::ExtractToDirectory($ArchivePath, $Destination)
+}
+
 function Receive-File {
     param([Uri]$Uri, [string]$Path, $ProgressBar, $StatusLabel)
     $client = New-Object Net.Http.HttpClient
@@ -174,6 +192,20 @@ function Install-VisualStudioExtension {
     }
 }
 
+function Ensure-QemuSupport {
+    param($Manifest, [string]$InstallRoot, $StatusLabel)
+    if (-not $Manifest.qemu -or -not $Manifest.qemu.ensureScript) { return }
+    $scriptPath = Get-SafeDestination $InstallRoot ([string]$Manifest.qemu.ensureScript)
+    if (-not (Test-Path $scriptPath)) { throw "The QEMU setup script is missing: $scriptPath" }
+    $StatusLabel.Text = 'Checking QEMU installation...'
+    [Windows.Forms.Application]::DoEvents()
+    $quotedScript = '"' + $scriptPath + '"'
+    $process = Start-Process -FilePath 'powershell.exe' -ArgumentList @(
+        '-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $quotedScript
+    ) -Wait -PassThru
+    if ($process.ExitCode -ne 0) { throw "QEMU setup failed with code $($process.ExitCode)." }
+}
+
 function Install-OESDK {
     param([Uri]$ManifestUri, [string]$InstallRoot, $ProgressBar, $StatusLabel)
     $workRoot = Join-Path $env:TEMP ("OESDK-Setup-" + [Guid]::NewGuid().ToString('N'))
@@ -199,17 +231,6 @@ function Install-OESDK {
             throw 'The OESDK manifest does not contain any downloadable packages.'
         }
 
-        $bootstrapVisualStudioManifest = [PSCustomObject]@{
-            visualStudio = [PSCustomObject]@{
-                communityBootstrapperUrl = 'https://aka.ms/vs/17/release/vs_community.exe'
-                components = @(
-                    'Microsoft.VisualStudio.Workload.NativeDesktop',
-                    'Microsoft.VisualStudio.Component.VC.Llvm.Clang'
-                )
-            }
-        }
-        $visualStudioPath = Ensure-VisualStudioSupport $bootstrapVisualStudioManifest $ProgressBar $StatusLabel
-
         $packageIndex = 0
         foreach ($package in @($manifest.packages)) {
             $packageIndex++
@@ -226,8 +247,20 @@ function Install-OESDK {
             }
             $destination = Get-SafeDestination $stageRoot ([string]$package.destination)
             [void][IO.Directory]::CreateDirectory($destination)
-            [IO.Compression.ZipFile]::ExtractToDirectory($archivePath, $destination)
+            Expand-SafeArchive $archivePath $destination
         }
+
+        $bootstrapVisualStudioManifest = [PSCustomObject]@{
+            visualStudio = [PSCustomObject]@{
+                communityBootstrapperUrl = 'https://aka.ms/vs/17/release/vs_community.exe'
+                components = @(
+                    'Microsoft.VisualStudio.Workload.NativeDesktop',
+                    'Microsoft.VisualStudio.Component.VC.Llvm.Clang',
+                    'Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang'
+                )
+            }
+        }
+        $visualStudioPath = Ensure-VisualStudioSupport $bootstrapVisualStudioManifest $ProgressBar $StatusLabel
 
         $StatusLabel.Text = 'Installing OESDK files...'
         [Windows.Forms.Application]::DoEvents()
@@ -236,6 +269,7 @@ function Install-OESDK {
         [Environment]::SetEnvironmentVariable('OESDK_ROOT', $InstallRoot, 'Machine')
         $env:OESDK_ROOT = $InstallRoot
 
+        Ensure-QemuSupport $manifest $InstallRoot $StatusLabel
         Install-VisualStudioExtension $manifest $InstallRoot $visualStudioPath $StatusLabel
         $ProgressBar.Value = 100
         $StatusLabel.Text = "OESDK $($manifest.sdkVersion) installed successfully."
@@ -245,7 +279,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.3'
+$form.Text = 'OESDK Setup 0.0.4'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -293,7 +327,7 @@ $installButton.Add_Click({
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.3`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.4`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null

@@ -1,15 +1,43 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.3",
-  "releaseStatus": "not-published",
-  "releaseMessage": "The OESDK SDK packages have not been published to GitHub yet. Publish the v0.0.3 release assets, replace Installer/manifest.json with the completed manifest, and run updater.bat again.",
-  "packages": [],
+  "sdkVersion": "0.0.4",
+  "releaseStatus": "ready",
+  "packages": [
+    {
+      "name": "OESDK Core",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.4.zip",
+      "sha256": "718432FD5D8307E514C927425FF26D67E001E0985E8D1353256903B3356F0B9A",
+      "destination": "."
+    },
+    {
+      "name": "OESDK x86-64 Support",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.4.zip",
+      "sha256": "E8EDD47D209A701F20ED265616807E84FAE3AA0CD5661B3470E0E0F71716CA78",
+      "destination": "."
+    },
+    {
+      "name": "OESDK QEMU x86-64",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-QEMU-x86_64.zip",
+      "sha256": "064CE89095B50B02E19FA300A514E5FDDB8368B149EE2EA7494378682C15ECBE",
+      "destination": "."
+    },
+    {
+      "name": "OESDK Visual Studio Integration",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.4.zip",
+      "sha256": "F6030B7AC6BA4FF111FF4263419A477EA678A4E71F89ECC9CFC81B8F892AD9EA",
+      "destination": "."
+    }
+  ],
   "visualStudio": {
     "communityBootstrapperUrl": "https://aka.ms/vs/17/release/vs_community.exe",
     "components": [
       "Microsoft.VisualStudio.Workload.NativeDesktop",
-      "Microsoft.VisualStudio.Component.VC.Llvm.Clang"
+      "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
+      "Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang"
     ],
     "vsix": "VisualStudio/OESDK.VisualStudio.vsix"
+  },
+  "qemu": {
+    "ensureScript": "Tools/Ensure-Qemu.ps1"
   }
 }
