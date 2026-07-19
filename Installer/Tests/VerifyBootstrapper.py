@@ -11,7 +11,7 @@ import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 EXE = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 SCRIPT = ROOT / "Source" / "Installer.ps1"
 CHECKSUM = ROOT / f"OESDK-Setup-{VERSION}-x64.sha256"

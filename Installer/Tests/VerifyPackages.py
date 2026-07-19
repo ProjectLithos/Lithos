@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -40,12 +40,16 @@ def verify() -> None:
     assert manifest["releaseStatus"] == "ready"
     assert len(manifest["packages"]) == 4
 
+    installed_paths: set[str] = set()
     for package in manifest["packages"]:
         path = ASSETS / pathlib.PurePosixPath(package["url"]).name
         assert path.is_file(), f"missing package: {path.name}"
         assert digest(path) == package["sha256"], f"stale hash: {path.name}"
         with zipfile.ZipFile(path) as archive:
-            safe_members(archive)
+            members = safe_members(archive)
+            duplicates = installed_paths.intersection(members)
+            assert not duplicates, f"packages overwrite the same installed paths: {sorted(duplicates)}"
+            installed_paths.update(members)
             assert archive.testzip() is None, f"corrupt package: {path.name}"
 
     core_path = ASSETS / f"OESDK-Core-{VERSION}.zip"
@@ -106,6 +110,7 @@ def verify() -> None:
     print("[ OK ] Core runtime, x86-64 boot, QEMU integration, and VSIX contents")
     print("[ OK ] Kernel and desktop project templates are structurally valid")
     print("[ OK ] All archives are readable and reject unsafe member paths")
+    print("[ OK ] Package extraction paths are unique across the staging area")
 
 
 if __name__ == "__main__":

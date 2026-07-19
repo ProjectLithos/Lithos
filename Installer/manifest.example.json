@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.4",
+  "sdkVersion": "0.0.5",
   "releaseStatus": "ready",
   "packages": [
     {
       "name": "OESDK Core",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.4.zip",
-      "sha256": "718432FD5D8307E514C927425FF26D67E001E0985E8D1353256903B3356F0B9A",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.5.zip",
+      "sha256": "992290F7F376EB0BDA4E3F764CFD357CA3F0ADA4E6DD2FB9245DE6521077C192",
       "destination": "."
     },
     {
       "name": "OESDK x86-64 Support",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.4.zip",
-      "sha256": "E8EDD47D209A701F20ED265616807E84FAE3AA0CD5661B3470E0E0F71716CA78",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.5.zip",
+      "sha256": "DCFA6535D973AA3280214EBA206452449D73A50A272A31A123FC80EC35AF2FAB",
       "destination": "."
     },
     {
       "name": "OESDK QEMU x86-64",
       "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-QEMU-x86_64.zip",
-      "sha256": "064CE89095B50B02E19FA300A514E5FDDB8368B149EE2EA7494378682C15ECBE",
+      "sha256": "99BEE22A4445724BBE92F9FEAA5B38E7DF82B1D28DA3065A66734C3E4CA171EE",
       "destination": "."
     },
     {
       "name": "OESDK Visual Studio Integration",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.4.zip",
-      "sha256": "F6030B7AC6BA4FF111FF4263419A477EA678A4E71F89ECC9CFC81B8F892AD9EA",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.5.zip",
+      "sha256": "BDF529C6263CEA2E0972C1A461C86C9D2B00738E39A4026F2CCC6990E6E0CE3B",
       "destination": "."
     }
   ],
