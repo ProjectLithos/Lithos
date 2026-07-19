@@ -1,4 +1,4 @@
-# OESDK Online Installer and SDK Packages 0.0.5
+# OESDK Online Installer and SDK Packages 0.0.6
 
 This source tree builds the small OESDK Windows bootstrapper and the first
 downloadable SDK package set. The installer reads its manifest directly from:
@@ -19,7 +19,11 @@ https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.j
   **OESDK Desktop GUI OS** project templates.
 
 The generated package archives live in `ReleaseAssets`. They are downloaded
-separately, keeping `OESDK-Setup-0.0.5-x64.exe` small.
+separately, keeping `OESDK-Setup-0.0.6-x64.exe` small.
+
+Version 0.0.6 also suppresses `HttpResponseMessage` pipeline output during
+downloads so Visual Studio's installation path is always returned as a single
+path string.
 
 ## User experience
 

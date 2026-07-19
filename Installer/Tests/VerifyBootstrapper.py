@@ -11,7 +11,7 @@ import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 EXE = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 SCRIPT = ROOT / "Source" / "Installer.ps1"
 CHECKSUM = ROOT / f"OESDK-Setup-{VERSION}-x64.sha256"
@@ -52,6 +52,7 @@ def verify() -> None:
     assert "raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.json" in embedded_script
     assert "releaseStatus" in embedded_script
     assert "Ensure-QemuSupport $manifest" in embedded_script
+    assert "[void]$response.EnsureSuccessStatusCode()" in embedded_script
 
     expected = CHECKSUM.read_text(encoding="ascii").split()[0]
     actual = hashlib.sha256(image).hexdigest().upper()

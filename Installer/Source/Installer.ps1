@@ -75,7 +75,7 @@ function Receive-File {
     $client = New-Object Net.Http.HttpClient
     try {
         $response = $client.GetAsync($Uri, [Net.Http.HttpCompletionOption]::ResponseHeadersRead).Result
-        $response.EnsureSuccessStatusCode()
+        [void]$response.EnsureSuccessStatusCode()
         $total = $response.Content.Headers.ContentLength
         $inputStream = $response.Content.ReadAsStreamAsync().Result
         $outputStream = [IO.File]::Create($Path)
@@ -279,7 +279,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.5'
+$form.Text = 'OESDK Setup 0.0.6'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -327,7 +327,7 @@ $installButton.Add_Click({
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.5`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.6`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null

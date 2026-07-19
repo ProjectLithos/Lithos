@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.5",
+  "sdkVersion": "0.0.6",
   "releaseStatus": "ready",
   "packages": [
     {
       "name": "OESDK Core",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.5.zip",
-      "sha256": "992290F7F376EB0BDA4E3F764CFD357CA3F0ADA4E6DD2FB9245DE6521077C192",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.6.zip",
+      "sha256": "2CBA12AFF2AF39DFE112CA196CF271ECB8F9497D6A58249FD2C9FC68A56D3BBB",
       "destination": "."
     },
     {
       "name": "OESDK x86-64 Support",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.5.zip",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.6.zip",
       "sha256": "DCFA6535D973AA3280214EBA206452449D73A50A272A31A123FC80EC35AF2FAB",
       "destination": "."
     },
@@ -23,8 +23,8 @@
     },
     {
       "name": "OESDK Visual Studio Integration",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.5.zip",
-      "sha256": "BDF529C6263CEA2E0972C1A461C86C9D2B00738E39A4026F2CCC6990E6E0CE3B",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.6.zip",
+      "sha256": "C59D31759DF4BD8479E0B0EF405AA9A7C00029E187C650868344FABD334A3F71",
       "destination": "."
     }
   ],
