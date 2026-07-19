@@ -1,28 +1,29 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.1",
+  "sdkVersion": "0.0.3",
+  "releaseStatus": "ready",
   "packages": [
     {
       "name": "OESDK Core",
-      "url": "https://downloads.oesdk.org/releases/0.0.1/OESDK-Core-0.0.1.zip",
+      "url": "https://github.com/ProjectLithos/Lithos/releases/download/v0.0.3/OESDK-Core-0.0.3.zip",
       "sha256": "REPLACE_WITH_64_CHARACTER_SHA256",
       "destination": "."
     },
     {
       "name": "OESDK x86-64 Support",
-      "url": "https://downloads.oesdk.org/releases/0.0.1/OESDK-x86_64-0.0.1.zip",
+      "url": "https://github.com/ProjectLithos/Lithos/releases/download/v0.0.3/OESDK-x86_64-0.0.3.zip",
       "sha256": "REPLACE_WITH_64_CHARACTER_SHA256",
       "destination": "."
     },
     {
       "name": "OESDK QEMU x86-64",
-      "url": "https://downloads.oesdk.org/releases/0.0.1/OESDK-QEMU-x86_64.zip",
+      "url": "https://github.com/ProjectLithos/Lithos/releases/download/v0.0.3/OESDK-QEMU-x86_64.zip",
       "sha256": "REPLACE_WITH_64_CHARACTER_SHA256",
       "destination": "Tools/QEMU"
     },
     {
       "name": "OESDK Visual Studio Integration",
-      "url": "https://downloads.oesdk.org/releases/0.0.1/OESDK-VisualStudio-0.0.1.zip",
+      "url": "https://github.com/ProjectLithos/Lithos/releases/download/v0.0.3/OESDK-VisualStudio-0.0.3.zip",
       "sha256": "REPLACE_WITH_64_CHARACTER_SHA256",
       "destination": "VisualStudio"
     }

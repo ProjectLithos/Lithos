@@ -1,6 +1,8 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 set "ExitCode="
+set "UpdaterVersion=0.0.4"
+echo [ OK ] Lithos updater %UpdaterVersion%.
 
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"
@@ -9,7 +11,6 @@ if defined LITHOS_BRANCH set "Branch=%LITHOS_BRANCH%"
 
 set "SourceInput=%~1"
 if not defined SourceInput if defined LITHOS_SOURCE_URL set "SourceInput=%LITHOS_SOURCE_URL%"
-if not defined SourceInput goto Usage
 
 for %%T in (curl.exe git.exe powershell.exe robocopy.exe) do (
     where %%T >nul 2>nul
@@ -18,6 +19,16 @@ for %%T in (curl.exe git.exe powershell.exe robocopy.exe) do (
         goto Cleanup
     )
 )
+
+if not defined SourceInput (
+    for /f "usebackq delims=" %%I in (`powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
+        "$d=Join-Path $env:USERPROFILE 'Downloads'; $f=Get-ChildItem -LiteralPath $d -File -Filter 'OESDK-Installer-*-Source*.zip' -ErrorAction SilentlyContinue | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1; if($f){$f.FullName}"`) do set "SourceInput=%%I"
+)
+if not defined SourceInput (
+    call :Fail "No OESDK installer source ZIP was found in your Downloads folder."
+    goto Cleanup
+)
+if "%~1"=="" if not defined LITHOS_SOURCE_URL call :Ok "Automatically selected source archive: %SourceInput%"
 
 set "LITHOS_EFFECTIVE_SOURCE_INPUT=%SourceInput%"
 set "LITHOS_EFFECTIVE_REPOSITORY=%Repository%"
@@ -190,7 +201,8 @@ set "ExitCode=0"
 goto Cleanup
 
 :Usage
-echo Usage: updater.bat ^<source-zip-file-or-https-zip-url^>
+echo Usage: updater.bat [source-zip-file-or-https-zip-url]
+echo With no argument, the newest OESDK-Installer-*-Source*.zip in Downloads is used.
 echo Example: updater.bat "C:\Users\daves\Downloads\OESDK-Installer-0.0.1-Source.zip"
 echo.
 echo Optional variables: LITHOS_SOURCE_SHA256, LITHOS_REPOSITORY,

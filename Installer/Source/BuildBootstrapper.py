@@ -12,7 +12,8 @@ import struct
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "Source" / "Installer.ps1"
-OUTPUT = ROOT / "OESDK-Setup-0.0.1-x64.exe"
+VERSION = "0.0.3"
+OUTPUT = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 IMAGE_BASE = 0x140000000
 FILE_ALIGNMENT = 0x200
 SECTION_ALIGNMENT = 0x1000
@@ -152,7 +153,7 @@ def build() -> None:
     image.extend(bytes(idata).ljust(idata_raw_size, b"\0"))
     OUTPUT.write_bytes(image)
     digest = hashlib.sha256(image).hexdigest().upper()
-    (ROOT / "OESDK-Setup-0.0.1-x64.sha256").write_text(
+    (ROOT / f"OESDK-Setup-{VERSION}-x64.sha256").write_text(
         f"{digest}  {OUTPUT.name}\n", encoding="ascii")
     print(f"Built {OUTPUT.name} ({len(image)} bytes)")
 

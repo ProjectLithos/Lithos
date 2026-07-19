@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.0.3",
+  "releaseStatus": "not-published",
+  "releaseMessage": "The OESDK SDK packages have not been published to GitHub yet. Publish the v0.0.3 release assets, replace Installer/manifest.json with the completed manifest, and run updater.bat again.",
+  "packages": [],
+  "visualStudio": {
+    "communityBootstrapperUrl": "https://aka.ms/vs/17/release/vs_community.exe",
+    "components": [
+      "Microsoft.VisualStudio.Workload.NativeDesktop",
+      "Microsoft.VisualStudio.Component.VC.Llvm.Clang"
+    ],
+    "vsix": "VisualStudio/OESDK.VisualStudio.vsix"
+  }
+}

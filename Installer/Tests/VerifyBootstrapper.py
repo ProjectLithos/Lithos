@@ -11,9 +11,10 @@ import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-EXE = ROOT / "OESDK-Setup-0.0.1-x64.exe"
+VERSION = "0.0.3"
+EXE = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 SCRIPT = ROOT / "Source" / "Installer.ps1"
-CHECKSUM = ROOT / "OESDK-Setup-0.0.1-x64.sha256"
+CHECKSUM = ROOT / f"OESDK-Setup-{VERSION}-x64.sha256"
 
 
 def verify() -> None:
@@ -42,6 +43,14 @@ def verify() -> None:
     payload_end = loader.index("')", payload_start)
     embedded_script = gzip.decompress(base64.b64decode(loader[payload_start:payload_end])).decode("utf-8")
     assert embedded_script == SCRIPT.read_text(encoding="utf-8"), "embedded script differs"
+    for product in ("Community", "Professional", "Enterprise"):
+        assert f"Microsoft.VisualStudio.Product.{product}" in embedded_script
+    ensure_call = "$visualStudioPath = Ensure-VisualStudioSupport $bootstrapVisualStudioManifest"
+    assert ensure_call in embedded_script
+    assert embedded_script.index("Receive-File $ManifestUri") < embedded_script.index(ensure_call)
+    assert "Installing Visual Studio Community..." in embedded_script
+    assert "raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.json" in embedded_script
+    assert "releaseStatus" in embedded_script
 
     expected = CHECKSUM.read_text(encoding="ascii").split()[0]
     actual = hashlib.sha256(image).hexdigest().upper()
@@ -49,6 +58,7 @@ def verify() -> None:
     print(f"[ OK ] Windows x64 PE structure: {len(image)} bytes")
     print("[ OK ] Native API imports: ShellExecuteW, ExitProcess")
     print("[ OK ] Embedded installer source matches Installer.ps1")
+    print("[ OK ] GitHub manifest, release guard and Visual Studio fallback are embedded")
     print(f"[ OK ] SHA-256: {actual}")
 
 

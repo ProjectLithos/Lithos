@@ -82,13 +82,45 @@ function Receive-File {
     }
 }
 
-function Install-VisualStudioSupport {
-    param($Manifest, [string]$InstallRoot, $ProgressBar, $StatusLabel)
+function Get-VisualStudioInstallation {
+    param([string]$VsWhere)
+    if (-not (Test-Path $VsWhere)) { return $null }
+
+    $allowedProducts = @(
+        'Microsoft.VisualStudio.Product.Community',
+        'Microsoft.VisualStudio.Product.Professional',
+        'Microsoft.VisualStudio.Product.Enterprise'
+    )
+    try {
+        $json = (& $VsWhere -all -products * -format json -utf8 2>$null | Out-String).Trim()
+        if ([string]::IsNullOrWhiteSpace($json)) { return $null }
+        $instances = @($json | ConvertFrom-Json)
+        return $instances |
+            Where-Object {
+                $allowedProducts -contains $_.productId -and
+                $_.isComplete -ne $false -and $_.isLaunchable -ne $false
+            } |
+            Sort-Object { [Version]$_.installationVersion } -Descending |
+            Select-Object -First 1
+    } catch {
+        throw "Visual Studio detection failed: $($_.Exception.Message)"
+    }
+}
+
+function Ensure-VisualStudioSupport {
+    param($Manifest, $ProgressBar, $StatusLabel)
     $installerRoot = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer'
     $vswhere = Join-Path $installerRoot 'vswhere.exe'
-    if (-not (Test-Path $vswhere)) {
+    $components = @('Microsoft.VisualStudio.Workload.NativeDesktop', 'Microsoft.VisualStudio.Component.VC.Llvm.Clang')
+    if ($Manifest.visualStudio -and $Manifest.visualStudio.components) {
+        $components = @($Manifest.visualStudio.components)
+    }
+
+    $installation = Get-VisualStudioInstallation $vswhere
+
+    if (-not $installation) {
         if (-not $Manifest.visualStudio -or -not $Manifest.visualStudio.communityBootstrapperUrl) {
-            throw 'Visual Studio Community was not found and the manifest does not provide its official bootstrapper address.'
+            throw 'No Visual Studio edition is installed and the manifest does not provide the official Community bootstrapper address.'
         }
         $bootstrapperUri = Get-HttpsUri ([string]$Manifest.visualStudio.communityBootstrapperUrl)
         $bootstrapper = Join-Path $env:TEMP ("OESDK-vs-community-" + [Guid]::NewGuid().ToString('N') + '.exe')
@@ -99,40 +131,45 @@ function Install-VisualStudioSupport {
             if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Microsoft Corporation') {
                 throw 'The Visual Studio Community bootstrapper is not validly signed by Microsoft.'
             }
-            $components = @('Microsoft.VisualStudio.Workload.NativeDesktop', 'Microsoft.VisualStudio.Component.VC.Llvm.Clang')
-            if ($Manifest.visualStudio.components) { $components = @($Manifest.visualStudio.components) }
             $arguments = @('--passive', '--wait', '--norestart', '--includeRecommended')
             foreach ($component in $components) { $arguments += @('--add', [string]$component) }
+            $StatusLabel.Text = 'Installing Visual Studio Community...'
+            [Windows.Forms.Application]::DoEvents()
             $process = Start-Process -FilePath $bootstrapper -ArgumentList $arguments -Wait -PassThru
             if ($process.ExitCode -notin @(0, 3010)) { throw "Visual Studio Community installation failed with code $($process.ExitCode)." }
         } finally {
             Remove-Item -LiteralPath $bootstrapper -Force -ErrorAction SilentlyContinue
         }
-        if (-not (Test-Path $vswhere)) { throw 'Visual Studio Community installation completed but could not be detected.' }
+        if (-not (Test-Path $vswhere)) { throw 'Visual Studio Community installation completed but the Visual Studio detector is missing.' }
+        $installation = Get-VisualStudioInstallation $vswhere
+        if (-not $installation) { throw 'Visual Studio Community installation completed but no full Visual Studio edition could be detected.' }
     }
 
-    $vsPath = (& $vswhere -latest -products Microsoft.VisualStudio.Product.Community -property installationPath).Trim()
-    if (-not $vsPath) { throw 'Visual Studio Community was not found.' }
-
-    $components = @('Microsoft.VisualStudio.Workload.NativeDesktop', 'Microsoft.VisualStudio.Component.VC.Llvm.Clang')
-    if ($Manifest.visualStudio -and $Manifest.visualStudio.components) {
-        $components = @($Manifest.visualStudio.components)
-    }
-
+    $vsPath = ([string]$installation.installationPath).Trim()
+    $displayName = if ([string]::IsNullOrWhiteSpace([string]$installation.displayName)) { 'Visual Studio' } else { [string]$installation.displayName }
     $setup = Join-Path $installerRoot 'setup.exe'
     if (-not (Test-Path $setup)) { throw 'The Visual Studio Installer is incomplete.' }
-    $arguments = @('modify', '--installPath', $vsPath, '--passive', '--norestart', '--includeRecommended')
+    $quotedVsPath = '"' + $vsPath + '"'
+    $arguments = @('modify', '--installPath', $quotedVsPath, '--passive', '--norestart', '--includeRecommended')
     foreach ($component in $components) { $arguments += @('--add', [string]$component) }
-    $StatusLabel.Text = 'Configuring Visual Studio Community...'
+    $StatusLabel.Text = "Configuring $displayName..."
     [Windows.Forms.Application]::DoEvents()
     $process = Start-Process -FilePath $setup -ArgumentList $arguments -Wait -PassThru
     if ($process.ExitCode -notin @(0, 3010)) { throw "Visual Studio configuration failed with code $($process.ExitCode)." }
+    return $vsPath
+}
 
+function Install-VisualStudioExtension {
+    param($Manifest, [string]$InstallRoot, [string]$VsPath, $StatusLabel)
     if ($Manifest.visualStudio -and $Manifest.visualStudio.vsix) {
         $vsixPath = Get-SafeDestination $InstallRoot ([string]$Manifest.visualStudio.vsix)
-        $vsixInstaller = Join-Path $vsPath 'Common7\IDE\VSIXInstaller.exe'
+        $vsixInstaller = Join-Path $VsPath 'Common7\IDE\VSIXInstaller.exe'
         if (-not (Test-Path $vsixPath)) { throw "The Visual Studio extension is missing: $vsixPath" }
-        $process = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', $vsixPath) -Wait -PassThru
+        if (-not (Test-Path $vsixInstaller)) { throw "The Visual Studio extension installer is missing: $vsixInstaller" }
+        $StatusLabel.Text = 'Installing OESDK Visual Studio integration...'
+        [Windows.Forms.Application]::DoEvents()
+        $quotedVsixPath = '"' + $vsixPath + '"'
+        $process = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', $quotedVsixPath) -Wait -PassThru
         if ($process.ExitCode -ne 0) { throw "Visual Studio extension installation failed with code $($process.ExitCode)." }
     }
 }
@@ -150,7 +187,28 @@ function Install-OESDK {
         $manifestPath = Join-Path $workRoot 'manifest.json'
         Receive-File $ManifestUri $manifestPath $ProgressBar $StatusLabel
         $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
-        if ($manifest.schemaVersion -ne 1 -or -not $manifest.packages) { throw 'Unsupported or incomplete OESDK package manifest.' }
+        if ($manifest.schemaVersion -ne 1) { throw 'Unsupported OESDK package manifest.' }
+        if ($manifest.releaseStatus -and $manifest.releaseStatus -ne 'ready') {
+            $releaseMessage = [string]$manifest.releaseMessage
+            if ([string]::IsNullOrWhiteSpace($releaseMessage)) {
+                $releaseMessage = 'The OESDK packages have not been published yet.'
+            }
+            throw $releaseMessage
+        }
+        if (-not $manifest.packages -or @($manifest.packages).Count -eq 0) {
+            throw 'The OESDK manifest does not contain any downloadable packages.'
+        }
+
+        $bootstrapVisualStudioManifest = [PSCustomObject]@{
+            visualStudio = [PSCustomObject]@{
+                communityBootstrapperUrl = 'https://aka.ms/vs/17/release/vs_community.exe'
+                components = @(
+                    'Microsoft.VisualStudio.Workload.NativeDesktop',
+                    'Microsoft.VisualStudio.Component.VC.Llvm.Clang'
+                )
+            }
+        }
+        $visualStudioPath = Ensure-VisualStudioSupport $bootstrapVisualStudioManifest $ProgressBar $StatusLabel
 
         $packageIndex = 0
         foreach ($package in @($manifest.packages)) {
@@ -178,7 +236,7 @@ function Install-OESDK {
         [Environment]::SetEnvironmentVariable('OESDK_ROOT', $InstallRoot, 'Machine')
         $env:OESDK_ROOT = $InstallRoot
 
-        Install-VisualStudioSupport $manifest $InstallRoot $ProgressBar $StatusLabel
+        Install-VisualStudioExtension $manifest $InstallRoot $visualStudioPath $StatusLabel
         $ProgressBar.Value = 100
         $StatusLabel.Text = "OESDK $($manifest.sdkVersion) installed successfully."
     } finally {
@@ -187,7 +245,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.1'
+$form.Text = 'OESDK Setup 0.0.3'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -198,7 +256,7 @@ $form.Font = New-Object Drawing.Font('Segoe UI', 9)
 $form.Controls[$form.Controls.Count - 1].Font = New-Object Drawing.Font('Segoe UI Semibold', 16)
 [void](New-Label $form 'The SDK, Clang components and QEMU are downloaded during installation.' 26 58 610)
 [void](New-Label $form 'Package manifest:' 26 94 130)
-$manifestBox = New-TextBox $form 'https://downloads.oesdk.org/releases/stable/manifest.json' 156 91 470
+$manifestBox = New-TextBox $form 'https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.json' 156 91 470
 [void](New-Label $form 'Install location:' 26 132 130)
 $installBox = New-TextBox $form 'C:\OESDK' 156 129 470
 
@@ -234,7 +292,11 @@ $installButton.Add_Click({
         [Windows.Forms.MessageBox]::Show($form, 'OESDK was installed successfully.', 'OESDK Setup', 'OK', 'Information') | Out-Null
     } catch {
         $status.Text = 'Installation failed.'
-        [Windows.Forms.MessageBox]::Show($form, $_.Exception.Message, 'OESDK Setup', 'OK', 'Error') | Out-Null
+        $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
+        $details = "OESDK Setup 0.0.3`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        [IO.File]::WriteAllText($logPath, $details)
+        $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
+        [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null
     } finally {
         $installButton.Enabled = $true
         $manifestBox.Enabled = $true
