@@ -1,4 +1,4 @@
-# OESDK Online Installer and SDK Packages 0.0.6
+# OESDK Online Installer and SDK Packages 0.0.7
 
 This source tree builds the small OESDK Windows bootstrapper and the first
 downloadable SDK package set. The installer reads its manifest directly from:
@@ -12,18 +12,21 @@ https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.j
 - **Core**: freestanding C headers, a small libc, VGA console, formatting,
   DEBUG-only COM1 output, runtime startup, and framebuffer drawing primitives.
 - **x86-64**: QEMU-compatible Multiboot entry point, 64-bit paging, linker script,
-  `Build-Kernel.ps1`, and `Run-Qemu.ps1`.
+  build/run scripts, a direct native project generator, and a Visual Studio
+  template-repair utility.
 - **QEMU**: automatic QEMU installation through Windows Package Manager and
   machine-wide `OESDK_QEMU` configuration.
-- **Visual Studio**: a VSIX containing **OESDK Freestanding Kernel** and
-  **OESDK Desktop GUI OS** project templates.
+- **Visual Studio**: a VSIX containing exactly two versioned native `.vcxproj`
+  templates: **OESDK 0.0.7 - Clang C Kernel (no .NET)** and **OESDK 0.0.7 -
+  Clang C Desktop OS (no .NET)**.
 
 The generated package archives live in `ReleaseAssets`. They are downloaded
-separately, keeping `OESDK-Setup-0.0.6-x64.exe` small.
+separately, keeping `OESDK-Setup-0.0.7-x64.exe` small.
 
-Version 0.0.6 also suppresses `HttpResponseMessage` pipeline output during
-downloads so Visual Studio's installation path is always returned as a single
-path string.
+Version 0.0.7 removes obsolete OESDK VSIX registrations, rebuilds Visual
+Studio's project-template cache, and gives both templates unique versioned
+identities. It also supplies `New-OESDKProject.bat`, which bypasses the Visual
+Studio template cache entirely and always creates a native `.vcxproj`.
 
 ## User experience
 
@@ -33,9 +36,19 @@ path string.
    Community from Microsoft.
 4. It adds the native C/C++ and Clang/LLVM components.
 5. It installs QEMU through `winget` when QEMU is absent.
-6. It installs the OESDK VSIX.
-7. In Visual Studio, select an OESDK template, build it, and use **Start Without
+6. It removes stale OESDK VSIX registrations, installs the current VSIX, and
+   rebuilds Visual Studio's template cache.
+7. In Visual Studio, select one of the two OESDK 0.0.7 native templates, build
+   it, and use **Start Without
    Debugging** to launch the resulting `kernel.elf` in QEMU.
+
+To create a project without the Visual Studio template picker:
+
+```bat
+C:\OESDK\Tools\New-OESDKProject.bat Koryn Kernel "%USERPROFILE%\source\repos"
+```
+
+Then open `Koryn.vcxproj` from the newly created project folder.
 
 Debug configurations define `DEBUG`, so `kdebugf(...)` is compiled in and sent
 to COM1. Release configurations omit it. `kprintf(...)` always targets the VGA

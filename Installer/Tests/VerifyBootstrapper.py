@@ -11,7 +11,7 @@ import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 EXE = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 SCRIPT = ROOT / "Source" / "Installer.ps1"
 CHECKSUM = ROOT / f"OESDK-Setup-{VERSION}-x64.sha256"
@@ -53,6 +53,9 @@ def verify() -> None:
     assert "releaseStatus" in embedded_script
     assert "Ensure-QemuSupport $manifest" in embedded_script
     assert "[void]$response.EnsureSuccessStatusCode()" in embedded_script
+    assert "Removing obsolete OESDK template registrations..." in embedded_script
+    assert "/installvstemplates" in embedded_script
+    assert "Close every Visual Studio window" in embedded_script
 
     expected = CHECKSUM.read_text(encoding="ascii").split()[0]
     actual = hashlib.sha256(image).hexdigest().upper()
@@ -60,7 +63,7 @@ def verify() -> None:
     print(f"[ OK ] Windows x64 PE structure: {len(image)} bytes")
     print("[ OK ] Native API imports: ShellExecuteW, ExitProcess")
     print("[ OK ] Embedded installer source matches Installer.ps1")
-    print("[ OK ] GitHub manifest, release guard and Visual Studio fallback are embedded")
+    print("[ OK ] GitHub manifest, Visual Studio fallback, OESDK cleanup and template refresh are embedded")
     print(f"[ OK ] SHA-256: {actual}")
 
 

@@ -184,11 +184,43 @@ function Install-VisualStudioExtension {
         $vsixInstaller = Join-Path $VsPath 'Common7\IDE\VSIXInstaller.exe'
         if (-not (Test-Path $vsixPath)) { throw "The Visual Studio extension is missing: $vsixPath" }
         if (-not (Test-Path $vsixInstaller)) { throw "The Visual Studio extension installer is missing: $vsixInstaller" }
-        $StatusLabel.Text = 'Installing OESDK Visual Studio integration...'
+        if (Get-Process -Name devenv -ErrorAction SilentlyContinue) {
+            throw 'Close every Visual Studio window, then run OESDK Setup again. Visual Studio must be closed while its old OESDK templates are removed.'
+        }
+
+        $StatusLabel.Text = 'Removing obsolete OESDK template registrations...'
+        [Windows.Forms.Application]::DoEvents()
+        $extensionIds = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+        [void]$extensionIds.Add('ProjectLithos.OESDK.VisualStudio')
+        $extensionRoot = Join-Path $env:LOCALAPPDATA 'Microsoft\VisualStudio'
+        if (Test-Path $extensionRoot) {
+            foreach ($manifestPath in Get-ChildItem -LiteralPath $extensionRoot -Filter 'extension.vsixmanifest' -File -Recurse -ErrorAction SilentlyContinue) {
+                try {
+                    $text = [IO.File]::ReadAllText($manifestPath.FullName)
+                    if ($text -match '(?i)OESDK' -and $text -match '(?i)<Identity\s+[^>]*Id="([^"]+)"') {
+                        [void]$extensionIds.Add($Matches[1])
+                    }
+                } catch { }
+            }
+        }
+        foreach ($extensionId in $extensionIds) {
+            $uninstall = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', "/uninstall:$extensionId") -Wait -PassThru
+            # A nonzero result also means that this older identity was not installed.
+        }
+
+        $StatusLabel.Text = 'Installing the two OESDK 0.0.7 native Clang C templates...'
         [Windows.Forms.Application]::DoEvents()
         $quotedVsixPath = '"' + $vsixPath + '"'
         $process = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', $quotedVsixPath) -Wait -PassThru
         if ($process.ExitCode -ne 0) { throw "Visual Studio extension installation failed with code $($process.ExitCode)." }
+
+        $devenv = Join-Path $VsPath 'Common7\IDE\devenv.com'
+        if (Test-Path $devenv) {
+            $StatusLabel.Text = 'Rebuilding the Visual Studio project-template cache...'
+            [Windows.Forms.Application]::DoEvents()
+            $refresh = Start-Process -FilePath $devenv -ArgumentList @('/installvstemplates') -Wait -PassThru -WindowStyle Hidden
+            if ($refresh.ExitCode -ne 0) { throw "Visual Studio template refresh failed with code $($refresh.ExitCode)." }
+        }
     }
 }
 
@@ -279,7 +311,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.6'
+$form.Text = 'OESDK Setup 0.0.7'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -327,7 +359,7 @@ $installButton.Add_Click({
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.6`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.7`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null

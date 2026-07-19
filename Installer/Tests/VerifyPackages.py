@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -65,8 +65,16 @@ def verify() -> None:
         assert "Architecture/x86_64/boot.S" in names
         assert "Architecture/x86_64/linker.ld" in names
         assert "Tools/Build-Kernel.ps1" in names
+        assert "Tools/New-OESDKProject.ps1" in names
+        assert "Tools/New-OESDKProject.bat" in names
+        assert "Tools/Repair-OESDKTemplates.ps1" in names
         boot = archive.read("Architecture/x86_64/boot.S")
         assert b"MULTIBOOT_MAGIC" in boot and b"MULTIBOOT_FLAGS" in boot and b"long_mode_entry" in boot
+        generator = archive.read("Tools/New-OESDKProject.ps1").decode("utf-8")
+        assert "Microsoft.Cpp.Default.props" in generator
+        assert ".vcxproj" in generator
+        assert "Microsoft.NET.Sdk" not in generator
+        assert "($ProjectName + '.csproj')" not in generator
 
     qemu_path = ASSETS / "OESDK-QEMU-x86_64.zip"
     with zipfile.ZipFile(qemu_path) as archive:
@@ -93,10 +101,16 @@ def verify() -> None:
                     template_names = safe_members(template)
                     assert project_name in template_names
                     assert "kmain.c" in template_names
+                    assert not any(name.endswith(".csproj") for name in template_names)
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
-                    element_tree.fromstring(template.read(vstemplate_name))
+                    template_xml = template.read(vstemplate_name)
+                    element_tree.fromstring(template_xml)
+                    assert b"OESDK 0.0.7 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v007" in template_xml
+                    assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
+                    assert "Microsoft.NET.Sdk" not in project and ".csproj" not in project
 
     source_path = ROOT / f"OESDK-Installer-{VERSION}-Source.zip"
     with zipfile.ZipFile(source_path) as source:
@@ -108,7 +122,8 @@ def verify() -> None:
 
     print("[ OK ] Four manifest packages exist and all SHA-256 values match")
     print("[ OK ] Core runtime, x86-64 boot, QEMU integration, and VSIX contents")
-    print("[ OK ] Kernel and desktop project templates are structurally valid")
+    print("[ OK ] Exactly two versioned native .vcxproj templates contain no .NET SDK project")
+    print("[ OK ] Direct native project generator and template repair utility are packaged")
     print("[ OK ] All archives are readable and reject unsafe member paths")
     print("[ OK ] Package extraction paths are unique across the staging area")
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>OESDK Desktop GUI OS</Name>
-    <Description>A native x86-64 graphical desktop OS starter built with Clang C and run with QEMU.</Description>
+    <Name>OESDK 0.0.7 - Clang C Desktop OS (no .NET)</Name>
+    <Description>The native x86-64 OESDK desktop OS template. Creates a .vcxproj using Clang C and QEMU; it does not use C# or .NET.</Description>
     <ProjectType>VC</ProjectType>
-    <DefaultName>LithosDesktop</DefaultName>
+    <DefaultName>LithosClangDesktop</DefaultName>
     <SortOrder>20</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <TemplateID>ProjectLithos.OESDK.Desktop.C</TemplateID>
+    <TemplateID>ProjectLithos.OESDK.v007.Desktop.ClangC</TemplateID>
   </TemplateData>
   <TemplateContent>
     <Project File="OESDKDesktop.vcxproj" TargetFileName="$safeprojectname$.vcxproj" ReplaceParameters="true">
