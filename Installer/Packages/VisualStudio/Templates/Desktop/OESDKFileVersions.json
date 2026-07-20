@@ -1,7 +1,0 @@
-{
-  "schemaVersion": 1,
-  "files": {
-    "Include/OSVersion.h": "0.0.1",
-    "Source/kmain.c": "0.0.1"
-  }
-}

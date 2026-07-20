@@ -1,46 +1,33 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.12",
-  "releaseStatus": "ready",
-  "packages": [
-    {
-      "name": "OESDK Core",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.12.zip",
-      "sha256": "EB41226ECEFFE21046DD7BBE6208E34AC74FAE19DD73F32614BE0F8B93463EEE",
-      "destination": "."
-    },
-    {
-      "name": "OESDK x86-64 Support",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.12.zip",
-      "sha256": "32F5216E49B91B0F667C3A829D4CAC6352BC5459CBD6BC78D5D10FD7B0D0BB3E",
-      "destination": "."
-    },
-    {
-      "name": "OESDK QEMU x86-64",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-QEMU-x86_64.zip",
-      "sha256": "99BEE22A4445724BBE92F9FEAA5B38E7DF82B1D28DA3065A66734C3E4CA171EE",
-      "destination": "."
-    },
-    {
-      "name": "OESDK Visual Studio Integration",
-      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.12.zip",
-      "sha256": "87041E29C2B9EFADDF43A784BA9EF9FDACCF6384882466049244F7FE9DECAF8C",
-      "destination": "."
-    }
-  ],
-  "visualStudio": {
-    "communityBootstrapperUrl": "https://aka.ms/vs/17/release/vs_community.exe",
-    "components": [
-      "Microsoft.VisualStudio.Workload.NativeDesktop",
-      "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
-      "Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang"
+  "sdkVersion": "0.0.13",
+  "releaseStatus": "source-ready",
+  "libc": {
+    "implementation": "Newlib",
+    "version": "4.6.0.20260123",
+    "sourceUrl": "https://sourceware.org/pub/newlib/newlib-4.6.0.20260123.tar.gz",
+    "sha256": "6ff27e3bf022666f43f7802255be680eeff722ac181b1725d21e2e8318604ee3",
+    "targets": [
+      "x86_64-elf"
     ],
-    "projectTemplates": [
-      "VisualStudio/ProjectTemplates/OESDKKernel.zip",
-      "VisualStudio/ProjectTemplates/OESDKDesktop.zip"
+    "configurations": [
+      "Debug",
+      "Release"
     ]
   },
-  "qemu": {
-    "ensureScript": "Tools/Ensure-Qemu.ps1"
-  }
+  "packages": [
+    {
+      "name": "OESDK LibC Source",
+      "path": "ReleaseAssets/OESDK-LibC-0.0.13-Source.zip"
+    },
+    {
+      "name": "OESDK LibC Integration",
+      "path": "ReleaseAssets/OESDK-LibC-0.0.13.zip"
+    },
+    {
+      "name": "OESDK LibC Symbols",
+      "path": "ReleaseAssets/OESDK-LibC-Symbols-0.0.13.zip",
+      "generatedAfterBuild": true
+    }
+  ]
 }

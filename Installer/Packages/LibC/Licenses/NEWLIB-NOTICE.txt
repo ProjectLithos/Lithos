@@ -1,0 +1,5 @@
+Newlib is a collection of software components under several permissive free
+software licences. The authoritative licence texts are included in each
+verified upstream Newlib source distribution. OESDK does not remove or replace
+those notices. Distributors must retain the upstream COPYING and component
+licence notices in binary and source distributions as required.
