@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -80,6 +80,13 @@ def verify() -> None:
         assert ".vcxproj" in generator
         assert "Microsoft.NET.Sdk" not in generator
         assert "($ProjectName + '.csproj')" not in generator
+        assert "-ProjectRoot &quot;$(ProjectDir).&quot;" in generator
+        build_script = archive.read("Tools/Build-Kernel.ps1").decode("utf-8")
+        assert "$rawProjectRoot.IndexOf('" + '"' + "')" in build_script
+        assert "$rawProjectRoot.Substring(0, $embeddedQuote)" in build_script
+        assert "-Configuration\\s+[^A-Za-z]*(Debug|Release)" in build_script
+        assert "-ProjectType\\s+[^A-Za-z]*(Kernel|Desktop)" in build_script
+        assert "(?:^|\\s)-Clean(?:\\s|$)" in build_script
         repair = archive.read("Tools/Repair-OESDKTemplates.ps1").decode("utf-8")
         assert "*OESDK*.zip" in repair
         assert "Visual Studio 2022\\Templates\\ProjectTemplates" in repair
@@ -125,12 +132,14 @@ def verify() -> None:
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
                     template_xml = template.read(vstemplate_name)
                     element_tree.fromstring(template_xml)
-                    assert b"OESDK 0.0.8 - Clang C" in template_xml
-                    assert b"ProjectLithos.OESDK.v008" in template_xml
+                    assert b"OESDK 0.0.9 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v009" in template_xml
                     assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
                     assert "Microsoft.NET.Sdk" not in project and ".csproj" not in project
+                    assert "-ProjectRoot &quot;$(ProjectDir).&quot;" in project
+                    assert "-ProjectRoot &quot;$(ProjectDir)&quot;" not in project
 
     source_path = ROOT / f"OESDK-Installer-{VERSION}-Source.zip"
     with zipfile.ZipFile(source_path) as source:
@@ -144,6 +153,7 @@ def verify() -> None:
     print("[ OK ] Core runtime, x86-64 boot, QEMU integration, and VSIX contents")
     print("[ OK ] Exactly two native .vcxproj templates are packaged for direct Visual Studio discovery")
     print("[ OK ] Direct native project generator and template repair utility are packaged")
+    print("[ OK ] Visual Studio project paths avoid trailing-backslash quote corruption")
     print("[ OK ] All archives are readable and reject unsafe member paths")
     print("[ OK ] Package extraction paths are unique across the staging area")
 

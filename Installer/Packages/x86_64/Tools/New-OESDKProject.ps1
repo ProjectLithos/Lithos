@@ -51,9 +51,9 @@ $projectXml = @'
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <NMakeBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir)&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir)&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean; powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir)&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir)&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean; powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectDir)Build\$(Configuration)\kernel.elf</NMakeOutput>
     <NMakeIncludeSearchPath>$(OESDK_ROOT)\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>
     <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
@@ -108,7 +108,7 @@ $source = $source.Replace('__PROJECT_NAME__', $ProjectName)
 $readme = @"
 # $ProjectName
 
-This is an OESDK 0.0.8 native Clang C $ProjectType project. It is a `.vcxproj`,
+This is an OESDK 0.0.9 native Clang C $ProjectType project. It is a `.vcxproj`,
 not a C# `.csproj`, and does not require the Microsoft .NET SDK.
 
 Build Debug or Release in Visual Studio, then use Start Without Debugging to

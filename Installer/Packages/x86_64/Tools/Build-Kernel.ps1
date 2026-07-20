@@ -33,7 +33,28 @@ if ([string]::IsNullOrWhiteSpace($sdkRoot) -or -not (Test-Path $sdkRoot)) {
     throw 'OESDK_ROOT is not set. Repair or reinstall OESDK.'
 }
 
-$projectRoot = [IO.Path]::GetFullPath($ProjectRoot)
+$rawProjectRoot = $ProjectRoot.Trim()
+# OESDK 0.0.8 templates quoted $(ProjectDir), whose trailing backslash could
+# escape the closing quote in the Windows command line. Accept that malformed
+# argument so projects already created with 0.0.8 continue to build.
+$embeddedQuote = $rawProjectRoot.IndexOf('"')
+if ($embeddedQuote -ge 0) {
+    $trailingArguments = $rawProjectRoot.Substring($embeddedQuote + 1)
+    if ($trailingArguments -match '-Configuration\s+[^A-Za-z]*(Debug|Release)') {
+        $Configuration = $Matches[1]
+    }
+    if ($trailingArguments -match '-ProjectType\s+[^A-Za-z]*(Kernel|Desktop)') {
+        $ProjectType = $Matches[1]
+    }
+    if ($trailingArguments -match '(?:^|\s)-Clean(?:\s|$)') {
+        $Clean = $true
+    }
+    $rawProjectRoot = $rawProjectRoot.Substring(0, $embeddedQuote).Trim()
+}
+if ([string]::IsNullOrWhiteSpace($rawProjectRoot)) {
+    throw 'The Visual Studio project directory is empty or malformed.'
+}
+$projectRoot = [IO.Path]::GetFullPath($rawProjectRoot)
 $outputRoot = Join-Path $projectRoot ("Build\" + $Configuration)
 if ($Clean) {
     if (Test-Path $outputRoot) { Remove-Item -LiteralPath $outputRoot -Recurse -Force }

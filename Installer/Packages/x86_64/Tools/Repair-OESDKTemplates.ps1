@@ -51,7 +51,7 @@ if (Test-Path -LiteralPath $projectTemplatesRoot) {
     }
 }
 
-Write-Host '[ .. ] Installing exactly two OESDK 0.0.8 native Clang C templates.'
+Write-Host '[ .. ] Installing exactly two OESDK 0.0.9 native Clang C templates.'
 [void][IO.Directory]::CreateDirectory($ownedTemplateRoot)
 foreach ($templateName in @('OESDKKernel.zip', 'OESDKDesktop.zip')) {
     $sourceTemplate = Join-Path $sdkRoot (Join-Path 'VisualStudio\ProjectTemplates' $templateName)
@@ -65,4 +65,4 @@ if (Test-Path -LiteralPath $devenv) {
     if ($refresh.ExitCode -ne 0) { throw "Visual Studio template refresh failed with code $($refresh.ExitCode)." }
 }
 
-Write-Host '[ OK ] Template repair finished. Visual Studio should now show exactly two OESDK 0.0.8 templates.'
+Write-Host '[ OK ] Template repair finished. Visual Studio should now show exactly two OESDK 0.0.9 templates.'
