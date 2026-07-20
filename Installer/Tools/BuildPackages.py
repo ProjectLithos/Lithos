@@ -13,7 +13,7 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PACKAGES = ROOT / "Packages"
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.9"
+VERSION = "0.0.10"
 RAW_BASE = "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets"
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 

@@ -28,6 +28,7 @@ void oesdk_serial_initialize(void) {
     initialized = true;
 }
 
+#ifdef DEBUG
 static void serial_emit(char character, void *context) {
     (void)context;
     if (!initialized) oesdk_serial_initialize();
@@ -36,7 +37,6 @@ static void serial_emit(char character, void *context) {
     out8(COM1, (uint8_t)character);
 }
 
-#ifdef DEBUG
 int oesdk_debug_printf(const char *format, ...) {
     va_list arguments;
     va_start(arguments, format);

@@ -1,9 +1,9 @@
-# OESDK Visual Studio integration 0.0.9
+# OESDK Visual Studio integration 0.0.10
 
 The installer supplies exactly two current templates:
 
-- **OESDK 0.0.9 - Clang C Kernel (no .NET)**
-- **OESDK 0.0.9 - Clang C Desktop OS (no .NET)**
+- **OESDK 0.0.10 - Clang C Kernel (no .NET)**
+- **OESDK 0.0.10 - Clang C Desktop OS (no .NET)**
 
 Both create native `.vcxproj` Makefile projects backed by the OESDK PowerShell
 build system, Clang C, LLD and QEMU. Neither creates a `.csproj` or requires the

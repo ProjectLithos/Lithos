@@ -5,11 +5,11 @@
 static kgfx_surface screen;
 static bool ready;
 
+#ifdef OESDK_DESKTOP
 static inline void out8(uint16_t port, uint8_t value) {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
-#ifdef OESDK_DESKTOP
 static inline uint8_t in8(uint16_t port) {
     uint8_t value;
     __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));

@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.9"
+VERSION = "0.0.10"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -63,6 +63,16 @@ def verify() -> None:
         assert "Include/oesdk/kernel.h" in names
         assert "Source/runtime.c" in names
         assert "Source/serial.c" in names
+        stddef = archive.read("Include/stddef.h").decode("utf-8")
+        stdint = archive.read("Include/stdint.h").decode("utf-8")
+        stdbool = archive.read("Include/stdbool.h").decode("utf-8")
+        assert "__INTELLISENSE__" in stddef and "unsigned long long size_t" in stddef
+        assert "__INTELLISENSE__" in stdint and "unsigned long long uintptr_t" in stdint
+        assert "__INTELLISENSE__" in stdbool and "#define bool unsigned char" in stdbool
+        graphics = archive.read("Source/graphics.c").decode("utf-8")
+        assert graphics.index("#ifdef OESDK_DESKTOP") < graphics.index("static inline void out8")
+        serial = archive.read("Source/serial.c").decode("utf-8")
+        assert serial.index("#ifdef DEBUG") < serial.index("static void serial_emit")
 
     architecture_path = ASSETS / f"OESDK-x86_64-{VERSION}.zip"
     with zipfile.ZipFile(architecture_path) as archive:
@@ -132,8 +142,8 @@ def verify() -> None:
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
                     template_xml = template.read(vstemplate_name)
                     element_tree.fromstring(template_xml)
-                    assert b"OESDK 0.0.9 - Clang C" in template_xml
-                    assert b"ProjectLithos.OESDK.v009" in template_xml
+                    assert b"OESDK 0.0.10 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v0010" in template_xml
                     assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
@@ -151,6 +161,8 @@ def verify() -> None:
 
     print("[ OK ] Four manifest packages exist and all SHA-256 values match")
     print("[ OK ] Core runtime, x86-64 boot, QEMU integration, and VSIX contents")
+    print("[ OK ] Freestanding headers include Visual Studio IntelliSense type fallbacks")
+    print("[ OK ] Desktop-only and debug-only helpers do not produce unused warnings")
     print("[ OK ] Exactly two native .vcxproj templates are packaged for direct Visual Studio discovery")
     print("[ OK ] Direct native project generator and template repair utility are packaged")
     print("[ OK ] Visual Studio project paths avoid trailing-backslash quote corruption")

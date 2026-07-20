@@ -227,7 +227,7 @@ function Install-VisualStudioExtension {
             throw 'The OESDK manifest must specify exactly two Visual Studio project templates.'
         }
 
-        $StatusLabel.Text = 'Installing the two OESDK 0.0.9 native Clang C templates...'
+        $StatusLabel.Text = 'Installing the two OESDK 0.0.10 native Clang C templates...'
         [Windows.Forms.Application]::DoEvents()
         $documents = [Environment]::GetFolderPath('MyDocuments')
         $templateRoot = Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates\OESDK'
@@ -355,7 +355,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.9'
+$form.Text = 'OESDK Setup 0.0.10'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -403,7 +403,7 @@ $installButton.Add_Click({
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.9`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.10`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null
