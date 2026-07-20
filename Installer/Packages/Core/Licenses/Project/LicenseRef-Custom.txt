@@ -1,0 +1,5 @@
+Custom licence selected by __OESDK_AUTHOR_NAME__.
+
+Replace this file with the complete terms under which this operating system is
+made available. Source headers use the SPDX identifier LicenseRef-Custom until
+those terms are finalised.

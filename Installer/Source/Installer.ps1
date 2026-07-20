@@ -32,6 +32,36 @@ function New-TextBox {
     return Add-Control $Form $box
 }
 
+function New-ComboBox {
+    param($Form, [string[]]$Items, [int]$X, [int]$Y, [int]$Width)
+    $box = New-Object Windows.Forms.ComboBox
+    $box.DropDownStyle = 'DropDownList'
+    $box.Location = New-Object Drawing.Point($X, $Y)
+    $box.Size = New-Object Drawing.Size($Width, 24)
+    [void]$box.Items.AddRange($Items)
+    $box.SelectedIndex = 0
+    return Add-Control $Form $box
+}
+
+function Assert-ProjectMetadata {
+    param([string]$AuthorName, [string]$AuthorEmail, [string]$LicenseId, [string]$OsVersion)
+    if ([string]::IsNullOrWhiteSpace($AuthorName)) { throw 'Enter the OS author name.' }
+    if ($AuthorName -notmatch "^[A-Za-z0-9 .,'_-]+$") {
+        throw 'The author name contains unsupported characters.'
+    }
+    try { $address = New-Object Net.Mail.MailAddress -ArgumentList $AuthorEmail } catch { throw 'Enter a valid author email address.' }
+    if ($address.Address -ne $AuthorEmail) { throw 'Enter one valid author email address.' }
+    $supportedLicenses = @(
+        'MIT', 'Apache-2.0', 'BSD-3-Clause', 'GPL-3.0-only', 'GPL-3.0-or-later',
+        'LGPL-3.0-only', 'LGPL-3.0-or-later', 'MPL-2.0', 'CC0-1.0',
+        'LicenseRef-Proprietary', 'LicenseRef-Custom'
+    )
+    if ($LicenseId -notin $supportedLicenses) { throw 'Select a supported OS licence.' }
+    if ($OsVersion -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') {
+        throw 'The OS version must use Major.Minor.Patch form, for example 0.0.1.'
+    }
+}
+
 function Get-HttpsUri {
     param([string]$Value)
     $uri = $null
@@ -219,15 +249,79 @@ function Remove-OESDKVisualStudioSupport {
     }
 }
 
+function Get-ProjectLicensePath {
+    param([string]$InstallRoot, [string]$LicenseId)
+    $fileName = switch ($LicenseId) {
+        'LicenseRef-Proprietary' { 'Proprietary.txt' }
+        'LicenseRef-Custom' { 'LicenseRef-Custom.txt' }
+        default { $LicenseId + '.txt' }
+    }
+    $path = Join-Path $InstallRoot (Join-Path 'Licenses\Project' $fileName)
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "The selected licence text is missing: $fileName" }
+    return $path
+}
+
+function Copy-CustomOESDKTemplate {
+    param(
+        [string]$SourceTemplate,
+        [string]$DestinationTemplate,
+        [string]$InstallRoot,
+        [string]$AuthorName,
+        [string]$AuthorEmail,
+        [string]$LicenseId,
+        [string]$OsVersion
+    )
+    $temporaryRoot = Join-Path $env:TEMP ('OESDK-Template-' + [Guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory($temporaryRoot)
+    try {
+        Expand-SafeArchive $SourceTemplate $temporaryRoot
+        $versionParts = $OsVersion.Split('.')
+        $replacements = [ordered]@{
+            '__OESDK_AUTHOR_NAME__' = $AuthorName
+            '__OESDK_AUTHOR_EMAIL__' = $AuthorEmail
+            '__OESDK_LICENSE_ID__' = $LicenseId
+            '__OESDK_OS_VERSION__' = $OsVersion
+            '__OESDK_OS_VERSION_MAJOR__' = $versionParts[0]
+            '__OESDK_OS_VERSION_MINOR__' = $versionParts[1]
+            '__OESDK_OS_VERSION_PATCH__' = $versionParts[2]
+        }
+        $utf8 = New-Object Text.UTF8Encoding($false)
+        foreach ($path in Get-ChildItem -LiteralPath $temporaryRoot -File -Recurse) {
+            if ($path.Name -eq 'LICENSE') { continue }
+            $content = [IO.File]::ReadAllText($path.FullName)
+            foreach ($entry in $replacements.GetEnumerator()) {
+                $content = $content.Replace([string]$entry.Key, [string]$entry.Value)
+            }
+            [IO.File]::WriteAllText($path.FullName, $content, $utf8)
+        }
+        $licenseText = [IO.File]::ReadAllText((Get-ProjectLicensePath $InstallRoot $LicenseId))
+        $licenseText = $licenseText.Replace('__OESDK_YEAR__', [DateTime]::Now.Year.ToString()).Replace('__OESDK_AUTHOR_NAME__', $AuthorName)
+        [IO.File]::WriteAllText((Join-Path $temporaryRoot 'LICENSE'), $licenseText, $utf8)
+        if (Test-Path -LiteralPath $DestinationTemplate) { Remove-Item -LiteralPath $DestinationTemplate -Force }
+        [IO.Compression.ZipFile]::CreateFromDirectory($temporaryRoot, $DestinationTemplate, [IO.Compression.CompressionLevel]::Optimal, $false)
+    } finally {
+        if (Test-Path -LiteralPath $temporaryRoot) { Remove-Item -LiteralPath $temporaryRoot -Recurse -Force }
+    }
+}
+
 function Install-VisualStudioExtension {
-    param($Manifest, [string]$InstallRoot, [string]$VsPath, $StatusLabel)
+    param(
+        $Manifest,
+        [string]$InstallRoot,
+        [string]$VsPath,
+        $StatusLabel,
+        [string]$AuthorName,
+        [string]$AuthorEmail,
+        [string]$LicenseId,
+        [string]$OsVersion
+    )
     if ($Manifest.visualStudio) {
 
-        if (-not $Manifest.visualStudio.projectTemplates -or @($Manifest.visualStudio.projectTemplates).Count -ne 2) {
-            throw 'The OESDK manifest must specify exactly two Visual Studio project templates.'
+        if (-not $Manifest.visualStudio.projectTemplates -or @($Manifest.visualStudio.projectTemplates).Count -eq 0) {
+            throw 'The OESDK manifest must specify at least one Visual Studio project template.'
         }
 
-        $StatusLabel.Text = 'Installing the two OESDK 0.0.11 native Clang C templates...'
+        $StatusLabel.Text = 'Installing personalised OESDK 0.0.12 native Clang C templates...'
         [Windows.Forms.Application]::DoEvents()
         $documents = [Environment]::GetFolderPath('MyDocuments')
         $templateRoot = Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates\OESDK'
@@ -236,7 +330,8 @@ function Install-VisualStudioExtension {
             $sourceTemplate = Get-SafeDestination $InstallRoot ([string]$relativeTemplate)
             if (-not (Test-Path -LiteralPath $sourceTemplate)) { throw "The OESDK project template is missing: $sourceTemplate" }
             $templateFile = Join-Path $templateRoot ([IO.Path]::GetFileName($sourceTemplate))
-            Copy-Item -LiteralPath $sourceTemplate -Destination $templateFile -Force
+            Copy-CustomOESDKTemplate $sourceTemplate $templateFile $InstallRoot $AuthorName $AuthorEmail $LicenseId $OsVersion
+            Copy-Item -LiteralPath $templateFile -Destination $sourceTemplate -Force
         }
 
         $devenv = Join-Path $VsPath 'Common7\IDE\devenv.com'
@@ -264,7 +359,16 @@ function Ensure-QemuSupport {
 }
 
 function Install-OESDK {
-    param([Uri]$ManifestUri, [string]$InstallRoot, $ProgressBar, $StatusLabel)
+    param(
+        [Uri]$ManifestUri,
+        [string]$InstallRoot,
+        $ProgressBar,
+        $StatusLabel,
+        [string]$AuthorName,
+        [string]$AuthorEmail,
+        [string]$LicenseId,
+        [string]$OsVersion
+    )
     $workRoot = Join-Path $env:TEMP ("OESDK-Setup-" + [Guid]::NewGuid().ToString('N'))
     $downloadRoot = Join-Path $workRoot 'Downloads'
     $stageRoot = Join-Path $workRoot 'Stage'
@@ -343,10 +447,18 @@ function Install-OESDK {
         [void][IO.Directory]::CreateDirectory($InstallRoot)
         Copy-Item -Path (Join-Path $stageRoot '*') -Destination $InstallRoot -Recurse -Force
         [Environment]::SetEnvironmentVariable('OESDK_ROOT', $InstallRoot, 'Machine')
+        [Environment]::SetEnvironmentVariable('OESDK_AUTHOR_NAME', $AuthorName, 'Machine')
+        [Environment]::SetEnvironmentVariable('OESDK_AUTHOR_EMAIL', $AuthorEmail, 'Machine')
+        [Environment]::SetEnvironmentVariable('OESDK_LICENSE', $LicenseId, 'Machine')
+        [Environment]::SetEnvironmentVariable('OESDK_OS_VERSION', $OsVersion, 'Machine')
         $env:OESDK_ROOT = $InstallRoot
+        $env:OESDK_AUTHOR_NAME = $AuthorName
+        $env:OESDK_AUTHOR_EMAIL = $AuthorEmail
+        $env:OESDK_LICENSE = $LicenseId
+        $env:OESDK_OS_VERSION = $OsVersion
 
         Ensure-QemuSupport $manifest $InstallRoot $StatusLabel
-        Install-VisualStudioExtension $manifest $InstallRoot $visualStudioPath $StatusLabel
+        Install-VisualStudioExtension $manifest $InstallRoot $visualStudioPath $StatusLabel $AuthorName $AuthorEmail $LicenseId $OsVersion
         $ProgressBar.Value = 100
         $StatusLabel.Text = "OESDK $($manifest.sdkVersion) installed successfully."
     } finally {
@@ -355,9 +467,9 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.11'
+$form.Text = 'OESDK Setup 0.0.12'
 $form.StartPosition = 'CenterScreen'
-$form.ClientSize = New-Object Drawing.Size(660, 300)
+$form.ClientSize = New-Object Drawing.Size(660, 438)
 $form.FormBorderStyle = 'FixedDialog'
 $form.MaximizeBox = $false
 $form.Font = New-Object Drawing.Font('Segoe UI', 9)
@@ -369,21 +481,33 @@ $form.Controls[$form.Controls.Count - 1].Font = New-Object Drawing.Font('Segoe U
 $manifestBox = New-TextBox $form 'https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.json' 156 91 470
 [void](New-Label $form 'Install location:' 26 132 130)
 $installBox = New-TextBox $form 'C:\OESDK' 156 129 470
+[void](New-Label $form "Author's name:" 26 170 130)
+$authorBox = New-TextBox $form ([Environment]::UserName) 156 167 470
+[void](New-Label $form 'Author email:' 26 208 130)
+$emailBox = New-TextBox $form '' 156 205 470
+[void](New-Label $form 'OS licence:' 26 246 130)
+$licenseBox = New-ComboBox $form @(
+    'MIT', 'Apache-2.0', 'BSD-3-Clause', 'GPL-3.0-only', 'GPL-3.0-or-later',
+    'LGPL-3.0-only', 'LGPL-3.0-or-later', 'MPL-2.0', 'CC0-1.0',
+    'LicenseRef-Proprietary', 'LicenseRef-Custom'
+) 156 243 470
+[void](New-Label $form 'Initial OS version:' 26 284 130)
+$osVersionBox = New-TextBox $form '0.0.1' 156 281 470
 
 $progress = New-Object Windows.Forms.ProgressBar
-$progress.Location = New-Object Drawing.Point(26, 177)
+$progress.Location = New-Object Drawing.Point(26, 327)
 $progress.Size = New-Object Drawing.Size(600, 22)
 [void]$form.Controls.Add($progress)
-$status = New-Label $form 'Ready to download OESDK.' 26 207 600
+$status = New-Label $form 'Ready to download OESDK.' 26 357 600
 
 $installButton = New-Object Windows.Forms.Button
 $installButton.Text = 'Install'
-$installButton.Location = New-Object Drawing.Point(438, 252)
+$installButton.Location = New-Object Drawing.Point(438, 395)
 $installButton.Size = New-Object Drawing.Size(90, 30)
 [void]$form.Controls.Add($installButton)
 $cancelButton = New-Object Windows.Forms.Button
 $cancelButton.Text = 'Cancel'
-$cancelButton.Location = New-Object Drawing.Point(536, 252)
+$cancelButton.Location = New-Object Drawing.Point(536, 395)
 $cancelButton.Size = New-Object Drawing.Size(90, 30)
 [void]$form.Controls.Add($cancelButton)
 $cancelButton.Add_Click({ $form.Close() })
@@ -392,18 +516,27 @@ $installButton.Add_Click({
     $installButton.Enabled = $false
     $manifestBox.Enabled = $false
     $installBox.Enabled = $false
+    $authorBox.Enabled = $false
+    $emailBox.Enabled = $false
+    $licenseBox.Enabled = $false
+    $osVersionBox.Enabled = $false
     try {
         $uri = Get-HttpsUri $manifestBox.Text.Trim()
         $root = [IO.Path]::GetFullPath($installBox.Text.Trim())
         if ($root.TrimEnd('\') -eq [IO.Path]::GetPathRoot($root).TrimEnd('\')) {
             throw 'OESDK cannot be installed directly into the root of a drive.'
         }
-        Install-OESDK $uri $root $progress $status
+        $authorName = $authorBox.Text.Trim()
+        $authorEmail = $emailBox.Text.Trim()
+        $licenseId = [string]$licenseBox.SelectedItem
+        $osVersion = $osVersionBox.Text.Trim()
+        Assert-ProjectMetadata $authorName $authorEmail $licenseId $osVersion
+        Install-OESDK $uri $root $progress $status $authorName $authorEmail $licenseId $osVersion
         [Windows.Forms.MessageBox]::Show($form, 'OESDK was installed successfully.', 'OESDK Setup', 'OK', 'Information') | Out-Null
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.11`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.12`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null
@@ -411,6 +544,10 @@ $installButton.Add_Click({
         $installButton.Enabled = $true
         $manifestBox.Enabled = $true
         $installBox.Enabled = $true
+        $authorBox.Enabled = $true
+        $emailBox.Enabled = $true
+        $licenseBox.Enabled = $true
+        $osVersionBox.Enabled = $true
     }
 })
 

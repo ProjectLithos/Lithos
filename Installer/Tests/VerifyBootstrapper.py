@@ -11,7 +11,7 @@ import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 EXE = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 SCRIPT = ROOT / "Source" / "Installer.ps1"
 CHECKSUM = ROOT / f"OESDK-Setup-{VERSION}-x64.sha256"
@@ -58,6 +58,16 @@ def verify() -> None:
     assert "*OESDK*.zip" in embedded_script
     assert "Visual Studio 2022\\Templates\\ProjectTemplates\\OESDK" in embedded_script
     assert "projectTemplates" in embedded_script
+    assert "Author's name:" in embedded_script
+    assert "Author email:" in embedded_script
+    assert "OS licence:" in embedded_script
+    assert "Initial OS version:" in embedded_script
+    assert "OESDK_AUTHOR_NAME" in embedded_script
+    assert "OESDK_AUTHOR_EMAIL" in embedded_script
+    assert "OESDK_LICENSE" in embedded_script
+    assert "OESDK_OS_VERSION" in embedded_script
+    assert "Copy-CustomOESDKTemplate" in embedded_script
+    assert "SPDX" not in embedded_script or "LICENSE" in embedded_script
     assert "ReparsePoint" in embedded_script
     assert "/installvstemplates" in embedded_script
     assert "Close every Visual Studio window" in embedded_script
@@ -70,6 +80,7 @@ def verify() -> None:
     print("[ OK ] Native API imports: ShellExecuteW, ExitProcess")
     print("[ OK ] Embedded installer source matches Installer.ps1")
     print("[ OK ] Clean replacement, direct VS template installation and catalogue refresh are embedded")
+    print("[ OK ] Author, email, licence and initial OS version collection are embedded")
     print(f"[ OK ] SHA-256: {actual}")
 
 

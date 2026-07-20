@@ -1,0 +1,5 @@
+Copyright (c) __OESDK_YEAR__ __OESDK_AUTHOR_NAME__. All rights reserved.
+
+This software is proprietary and confidential. No permission is granted to
+copy, modify, distribute, publish, sublicense, reverse engineer, or create
+derivative works without a separate written licence from the copyright holder.

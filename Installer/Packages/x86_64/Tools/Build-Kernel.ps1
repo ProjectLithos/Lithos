@@ -55,6 +55,10 @@ if ([string]::IsNullOrWhiteSpace($rawProjectRoot)) {
     throw 'The Visual Studio project directory is empty or malformed.'
 }
 $projectRoot = [IO.Path]::GetFullPath($rawProjectRoot)
+$metadataValidator = Join-Path $sdkRoot 'Tools\Test-OESDKProjectMetadata.ps1'
+if ((Test-Path -LiteralPath (Join-Path $projectRoot 'OESDKProject.json')) -and (Test-Path -LiteralPath $metadataValidator)) {
+    & $metadataValidator -ProjectRoot $projectRoot
+}
 $outputRoot = Join-Path $projectRoot ("Build\" + $Configuration)
 if ($Clean) {
     if (Test-Path $outputRoot) { Remove-Item -LiteralPath $outputRoot -Recurse -Force }

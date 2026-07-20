@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>OESDK 0.0.11 - Clang C Desktop OS (no .NET)</Name>
+    <Name>OESDK 0.0.12 - Clang C Desktop OS (no .NET)</Name>
     <Description>The native x86-64 OESDK desktop OS template. Creates a .vcxproj using Clang C and QEMU; it does not use C# or .NET.</Description>
     <ProjectType>VC</ProjectType>
     <DefaultName>LithosClangDesktop</DefaultName>
     <SortOrder>20</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <TemplateID>ProjectLithos.OESDK.v0011.Desktop.ClangC</TemplateID>
+    <TemplateID>ProjectLithos.OESDK.v0012.Desktop.ClangC</TemplateID>
   </TemplateData>
   <TemplateContent>
     <Project File="OESDKDesktop.vcxproj" TargetFileName="$safeprojectname$.vcxproj" ReplaceParameters="true">
       <Folder Name="Source" TargetFolderName="Source">
         <ProjectItem ReplaceParameters="true" TargetFileName="kmain.c">kmain.c</ProjectItem>
       </Folder>
+      <Folder Name="Include" TargetFolderName="Include">
+        <ProjectItem ReplaceParameters="true" TargetFileName="OSVersion.h">OSVersion.h</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="OESDKProject.json">OESDKProject.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="OESDKFileVersions.json">OESDKFileVersions.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="AUTHORS">AUTHORS</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="LICENSE">LICENSE</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="README.md">README.md</ProjectItem>
     </Project>
   </TemplateContent>

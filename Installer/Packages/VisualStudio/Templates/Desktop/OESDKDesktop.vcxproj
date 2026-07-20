@@ -25,5 +25,13 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup><ClCompile Include="Source\kmain.c" /></ItemGroup>
+  <ItemGroup><ClInclude Include="Include\OSVersion.h" /></ItemGroup>
+  <ItemGroup>
+    <None Include="AUTHORS" />
+    <None Include="LICENSE" />
+    <None Include="OESDKFileVersions.json" />
+    <None Include="OESDKProject.json" />
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -61,11 +61,15 @@ def verify() -> None:
     with zipfile.ZipFile(core_path) as archive:
         names = safe_members(archive)
         assert "Include/oesdk/kernel.h" in names
+        assert "Licenses/Project/MIT.txt" in names
+        assert "Licenses/Project/GPL-3.0-or-later.txt" in names
         assert "Source/runtime.c" in names
         assert "Source/serial.c" in names
         stddef = archive.read("Include/stddef.h").decode("utf-8")
         stdint = archive.read("Include/stdint.h").decode("utf-8")
         stdbool = archive.read("Include/stdbool.h").decode("utf-8")
+        kernel_header = archive.read("Include/oesdk/kernel.h").decode("utf-8")
+        assert "#define OESDK_VERSION_PATCH 12" in kernel_header
         assert "__INTELLISENSE__" in stddef and "unsigned long long size_t" in stddef
         assert "__INTELLISENSE__" in stdint and "unsigned long long uintptr_t" in stdint
         assert "__INTELLISENSE__" in stdbool and "#define bool unsigned char" in stdbool
@@ -83,6 +87,8 @@ def verify() -> None:
         assert "Tools/New-OESDKProject.ps1" in names
         assert "Tools/New-OESDKProject.bat" in names
         assert "Tools/Repair-OESDKTemplates.ps1" in names
+        assert "Tools/Test-OESDKProjectMetadata.ps1" in names
+        assert "Tools/Set-OESDKFileVersion.ps1" in names
         boot = archive.read("Architecture/x86_64/boot.S")
         assert b"MULTIBOOT_MAGIC" in boot and b"MULTIBOOT_FLAGS" in boot and b"long_mode_entry" in boot
         generator = archive.read("Tools/New-OESDKProject.ps1").decode("utf-8")
@@ -95,6 +101,10 @@ def verify() -> None:
         assert "<NMakeIncludeSearchPath>$(OESDK_ROOT)\\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>" in generator
         assert "__INTELLISENSE__=1;DEBUG=1__PROJECT_DEFINITION__" in generator
         assert "OESDK_DESKTOP=1" in generator
+        assert "AuthorName" in generator and "AuthorEmail" in generator
+        assert "OESDKFileVersions.json" in generator
+        assert "File Version:" in generator
+        assert "SPDX-License-Identifier:" in generator
         build_script = archive.read("Tools/Build-Kernel.ps1").decode("utf-8")
         assert "$rawProjectRoot.IndexOf('" + '"' + "')" in build_script
         assert "$rawProjectRoot.Substring(0, $embeddedQuote)" in build_script
@@ -126,6 +136,10 @@ def verify() -> None:
             with open_nested(package, direct_template) as template:
                 direct_names = safe_members(template)
                 assert project_name in direct_names
+                assert "OESDKProject.json" in direct_names
+                assert "OESDKFileVersions.json" in direct_names
+                assert "OSVersion.h" in direct_names
+                assert "AUTHORS" in direct_names and "LICENSE" in direct_names
                 assert any(name.endswith(".vstemplate") for name in direct_names)
         with open_nested(package, "VisualStudio/OESDK.VisualStudio.vsix") as vsix:
             vsix_names = safe_members(vsix)
@@ -142,12 +156,22 @@ def verify() -> None:
                     template_names = safe_members(template)
                     assert project_name in template_names
                     assert "kmain.c" in template_names
+                    assert "OSVersion.h" in template_names
+                    assert "OESDKProject.json" in template_names
+                    assert "OESDKFileVersions.json" in template_names
+                    source = template.read("kmain.c").decode("utf-8")
+                    header = source.split("*/", 1)[0]
+                    assert "File Version: 0.0.1" in header
+                    assert "Author: __OESDK_AUTHOR_NAME__" in header
+                    assert "Email: __OESDK_AUTHOR_EMAIL__" in header
+                    assert "License: __OESDK_LICENSE_ID__" in header
+                    assert "OS Version:" not in header
                     assert not any(name.endswith(".csproj") for name in template_names)
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
                     template_xml = template.read(vstemplate_name)
                     element_tree.fromstring(template_xml)
-                    assert b"OESDK 0.0.11 - Clang C" in template_xml
-                    assert b"ProjectLithos.OESDK.v0011" in template_xml
+                    assert b"OESDK 0.0.12 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v0012" in template_xml
                     assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
@@ -175,6 +199,7 @@ def verify() -> None:
     print("[ OK ] Direct native project generator and template repair utility are packaged")
     print("[ OK ] Visual Studio project paths avoid trailing-backslash quote corruption")
     print("[ OK ] VS IncludePath, NMake include path, and IntelliSense definitions are preconfigured")
+    print("[ OK ] Author, email, licence, OS metadata, and independent file versions are packaged")
     print("[ OK ] All archives are readable and reject unsafe member paths")
     print("[ OK ] Package extraction paths are unique across the staging area")
 

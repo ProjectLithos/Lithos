@@ -12,7 +12,7 @@ import struct
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "Source" / "Installer.ps1"
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 OUTPUT = ROOT / f"OESDK-Setup-{VERSION}-x64.exe"
 IMAGE_BASE = 0x140000000
 FILE_ALIGNMENT = 0x200

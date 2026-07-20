@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 set "ExitCode="
-set "UpdaterVersion=0.0.4"
+set "UpdaterVersion=0.0.5"
 echo [ OK ] Lithos updater %UpdaterVersion%.
 
 set "Repository=ProjectLithos/Lithos"
@@ -109,6 +109,20 @@ if not defined SourceRoot (
     call :Fail "The downloaded source archive is empty."
     goto Cleanup
 )
+
+set "LITHOS_SOURCE_ROOT=%SourceRoot%"
+set "LITHOS_SOURCE_INPUT=%SourceInput%"
+for /f "usebackq delims=" %%I in (`powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
+    "$ErrorActionPreference='Stop'; $r=[IO.Path]::GetFullPath($env:LITHOS_SOURCE_ROOT); $mp=Join-Path $r 'manifest.json'; if(-not(Test-Path -LiteralPath $mp -PathType Leaf)){throw 'manifest.json is missing'}; $m=Get-Content -Raw -LiteralPath $mp ^| ConvertFrom-Json; $v=[string]$m.sdkVersion; if($v -notmatch '^(0^|[1-9][0-9]*)\.(0^|[1-9][0-9]*)\.(0^|[1-9][0-9]*)$'){throw 'sdkVersion is invalid'}; if($m.schemaVersion -ne 1 -or @($m.packages).Count -lt 1){throw 'manifest schema or packages are invalid'}; $leaf=if(Test-Path -LiteralPath $env:LITHOS_SOURCE_INPUT){[IO.Path]::GetFileName($env:LITHOS_SOURCE_INPUT)}else{[IO.Path]::GetFileName(([Uri]$env:LITHOS_SOURCE_INPUT).AbsolutePath)}; if($leaf -notmatch '^OESDK-Installer-([0-9]+\.[0-9]+\.[0-9]+)-Source.*\.zip$' -or $Matches[1] -ne $v){throw 'source ZIP filename and manifest version differ'}; foreach($p in @($m.packages)){$name=[IO.Path]::GetFileName(([Uri][string]$p.url).AbsolutePath); $asset=Join-Path $r (Join-Path 'ReleaseAssets' $name); if(-not(Test-Path -LiteralPath $asset -PathType Leaf)){throw ('missing release asset: '+$name)}; if((Get-FileHash -Algorithm SHA256 -LiteralPath $asset).Hash -ne ([string]$p.sha256).ToUpperInvariant()){throw ('stale release asset hash: '+$name)}}; foreach($required in @('Source\Installer.ps1','Source\BuildBootstrapper.py','Tools\BuildPackages.py','Tests\VerifyPackages.py')){if(-not(Test-Path -LiteralPath (Join-Path $r $required) -PathType Leaf)){throw ('missing source file: '+$required)}}; $h=Get-Content -Raw -LiteralPath (Join-Path $r 'Packages\Core\Include\oesdk\kernel.h'); $parts=$v.Split('.'); if($h -notmatch ('OESDK_VERSION_MAJOR\s+'+[Regex]::Escape($parts[0])) -or $h -notmatch ('OESDK_VERSION_MINOR\s+'+[Regex]::Escape($parts[1])) -or $h -notmatch ('OESDK_VERSION_PATCH\s+'+[Regex]::Escape($parts[2]))){throw 'public SDK header version differs from manifest'}; $v"`) do set "SourceVersion=%%I"
+if errorlevel 1 (
+    call :Fail "The OESDK source archive failed release validation."
+    goto Cleanup
+)
+if not defined SourceVersion (
+    call :Fail "The OESDK source archive did not report a version."
+    goto Cleanup
+)
+call :Ok "Validated OESDK %SourceVersion% manifest, release assets, hashes, source files, and public version header."
 
 call :Ok "Cloning %Repository%."
 git.exe clone "https://github.com/%Repository%.git" "%Checkout%"
