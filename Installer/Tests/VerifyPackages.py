@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.10"
+VERSION = "0.0.11"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -91,6 +91,10 @@ def verify() -> None:
         assert "Microsoft.NET.Sdk" not in generator
         assert "($ProjectName + '.csproj')" not in generator
         assert "-ProjectRoot &quot;$(ProjectDir).&quot;" in generator
+        assert "<IncludePath>$(OESDK_ROOT)\\Include;$(ProjectDir)Include;$(IncludePath)</IncludePath>" in generator
+        assert "<NMakeIncludeSearchPath>$(OESDK_ROOT)\\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>" in generator
+        assert "__INTELLISENSE__=1;DEBUG=1__PROJECT_DEFINITION__" in generator
+        assert "OESDK_DESKTOP=1" in generator
         build_script = archive.read("Tools/Build-Kernel.ps1").decode("utf-8")
         assert "$rawProjectRoot.IndexOf('" + '"' + "')" in build_script
         assert "$rawProjectRoot.Substring(0, $embeddedQuote)" in build_script
@@ -130,9 +134,9 @@ def verify() -> None:
             assert "ProjectTemplates/OESDKDesktop.zip" in vsix_names
             element_tree.fromstring(vsix.read("extension.vsixmanifest"))
             element_tree.fromstring(vsix.read("[Content_Types].xml"))
-            for template_name, project_name in (
-                ("ProjectTemplates/OESDKKernel.zip", "OESDKKernel.vcxproj"),
-                ("ProjectTemplates/OESDKDesktop.zip", "OESDKDesktop.vcxproj"),
+            for template_name, project_name, debug_definitions, release_definitions in (
+                ("ProjectTemplates/OESDKKernel.zip", "OESDKKernel.vcxproj", "__INTELLISENSE__=1;DEBUG=1", "__INTELLISENSE__=1"),
+                ("ProjectTemplates/OESDKDesktop.zip", "OESDKDesktop.vcxproj", "__INTELLISENSE__=1;DEBUG=1;OESDK_DESKTOP=1", "__INTELLISENSE__=1;OESDK_DESKTOP=1"),
             ):
                 with open_nested(vsix, template_name) as template:
                     template_names = safe_members(template)
@@ -142,14 +146,18 @@ def verify() -> None:
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
                     template_xml = template.read(vstemplate_name)
                     element_tree.fromstring(template_xml)
-                    assert b"OESDK 0.0.10 - Clang C" in template_xml
-                    assert b"ProjectLithos.OESDK.v0010" in template_xml
+                    assert b"OESDK 0.0.11 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v0011" in template_xml
                     assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
                     assert "Microsoft.NET.Sdk" not in project and ".csproj" not in project
                     assert "-ProjectRoot &quot;$(ProjectDir).&quot;" in project
                     assert "-ProjectRoot &quot;$(ProjectDir)&quot;" not in project
+                    assert "<IncludePath>$(OESDK_ROOT)\\Include;$(ProjectDir)Include;$(IncludePath)</IncludePath>" in project
+                    assert "<NMakeIncludeSearchPath>$(OESDK_ROOT)\\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>" in project
+                    assert f">{debug_definitions}</NMakePreprocessorDefinitions>" in project
+                    assert f">{release_definitions}</NMakePreprocessorDefinitions>" in project
 
     source_path = ROOT / f"OESDK-Installer-{VERSION}-Source.zip"
     with zipfile.ZipFile(source_path) as source:
@@ -166,6 +174,7 @@ def verify() -> None:
     print("[ OK ] Exactly two native .vcxproj templates are packaged for direct Visual Studio discovery")
     print("[ OK ] Direct native project generator and template repair utility are packaged")
     print("[ OK ] Visual Studio project paths avoid trailing-backslash quote corruption")
+    print("[ OK ] VS IncludePath, NMake include path, and IntelliSense definitions are preconfigured")
     print("[ OK ] All archives are readable and reject unsafe member paths")
     print("[ OK ] Package extraction paths are unique across the staging area")
 

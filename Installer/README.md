@@ -1,4 +1,4 @@
-# OESDK Online Installer and SDK Packages 0.0.10
+# OESDK Online Installer and SDK Packages 0.0.11
 
 This source tree builds the small OESDK Windows bootstrapper and the first
 downloadable SDK package set. The installer reads its manifest directly from:
@@ -17,17 +17,17 @@ https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.j
 - **QEMU**: automatic QEMU installation through Windows Package Manager and
   machine-wide `OESDK_QEMU` configuration.
 - **Visual Studio**: exactly two versioned native `.vcxproj` templates:
-  **OESDK 0.0.10 - Clang C Kernel (no .NET)** and **OESDK 0.0.10 - Clang C
+  **OESDK 0.0.11 - Clang C Kernel (no .NET)** and **OESDK 0.0.11 - Clang C
   Desktop OS (no .NET)**. Setup places them directly in Visual Studio 2022's
   per-user project-template directory.
 
 The generated package archives live in `ReleaseAssets`. They are downloaded
-separately, keeping `OESDK-Setup-0.0.10-x64.exe` small.
+separately, keeping `OESDK-Setup-0.0.11-x64.exe` small.
 
-Version 0.0.10 is a clean replacement. After verifying the new downloads, setup
+Version 0.0.11 is a clean replacement. After verifying the new downloads, setup
 removes the old OESDK installation, all OESDK VSIX registrations, and all old
 OESDK template ZIPs. It then installs exactly two new templates directly into
-Visual Studio's user-template directory and rebuilds the catalogue. The 0.0.10
+Visual Studio's user-template directory and rebuilds the catalogue. The 0.0.11
 templates prevent Windows command-line quoting from corrupting a project path
 that ends in a backslash. The build script also repairs that malformed argument
 when an existing project was created from the 0.0.8 template.
@@ -37,6 +37,11 @@ Visual Studio IntelliSense branch, while Clang continues to use its native
 freestanding types. Desktop-only and debug-only helpers are also compiled only
 when their corresponding configuration is selected, keeping the Error List
 free from unused-function warnings.
+
+Every generated Visual Studio project now configures the SDK include directory
+in both **VC++ Directories / Include Directories** and **NMake / Include Search
+Path**. It also defines `__INTELLISENSE__=1` for the code model, with `DEBUG=1`
+and `OESDK_DESKTOP=1` added only to the matching project configuration.
 
 ## User experience
 
@@ -49,7 +54,7 @@ free from unused-function warnings.
 6. It removes all previous OESDK SDK files, VSIX registrations, and templates.
 7. It installs the two current template ZIPs directly into Visual Studio and
    rebuilds its project-template catalogue.
-8. In Visual Studio, select one of the two OESDK 0.0.10 native templates, build
+8. In Visual Studio, select one of the two OESDK 0.0.11 native templates, build
    it, and use **Start Without
    Debugging** to launch the resulting `kernel.elf` in QEMU.
 

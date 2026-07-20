@@ -16,7 +16,10 @@
     <NMakeReBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType Desktop -Clean; powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType Desktop</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType Desktop -Clean</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectDir)Build\$(Configuration)\kernel.elf</NMakeOutput>
+    <IncludePath>$(OESDK_ROOT)\Include;$(ProjectDir)Include;$(IncludePath)</IncludePath>
     <NMakeIncludeSearchPath>$(OESDK_ROOT)\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">__INTELLISENSE__=1;DEBUG=1;OESDK_DESKTOP=1</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Release'">__INTELLISENSE__=1;OESDK_DESKTOP=1</NMakePreprocessorDefinitions>
     <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Run-Qemu.ps1&quot; -Kernel &quot;$(ProjectDir)Build\$(Configuration)\kernel.elf&quot;</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

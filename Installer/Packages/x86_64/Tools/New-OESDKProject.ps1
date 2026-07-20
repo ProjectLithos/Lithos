@@ -55,7 +55,10 @@ $projectXml = @'
     <NMakeReBuildCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean; powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Build-Kernel.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot; -ProjectType __PROJECT_TYPE__ -Clean</NMakeCleanCommandLine>
     <NMakeOutput>$(ProjectDir)Build\$(Configuration)\kernel.elf</NMakeOutput>
+    <IncludePath>$(OESDK_ROOT)\Include;$(ProjectDir)Include;$(IncludePath)</IncludePath>
     <NMakeIncludeSearchPath>$(OESDK_ROOT)\Include;$(ProjectDir)Include</NMakeIncludeSearchPath>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">__INTELLISENSE__=1;DEBUG=1__PROJECT_DEFINITION__</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Release'">__INTELLISENSE__=1__PROJECT_DEFINITION__</NMakePreprocessorDefinitions>
     <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Run-Qemu.ps1&quot; -Kernel &quot;$(ProjectDir)Build\$(Configuration)\kernel.elf&quot;</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
@@ -64,7 +67,8 @@ $projectXml = @'
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
 '@
-$projectXml = $projectXml.Replace('__PROJECT_GUID__', $projectGuid).Replace('__PROJECT_NAME__', $escapedName).Replace('__PROJECT_TYPE__', $ProjectType)
+$projectDefinition = if ($ProjectType -eq 'Desktop') { ';OESDK_DESKTOP=1' } else { '' }
+$projectXml = $projectXml.Replace('__PROJECT_GUID__', $projectGuid).Replace('__PROJECT_NAME__', $escapedName).Replace('__PROJECT_TYPE__', $ProjectType).Replace('__PROJECT_DEFINITION__', $projectDefinition)
 
 if ($ProjectType -eq 'Desktop') {
     $source = @'
@@ -108,7 +112,7 @@ $source = $source.Replace('__PROJECT_NAME__', $ProjectName)
 $readme = @"
 # $ProjectName
 
-This is an OESDK 0.0.10 native Clang C $ProjectType project. It is a `.vcxproj`,
+This is an OESDK 0.0.11 native Clang C $ProjectType project. It is a `.vcxproj`,
 not a C# `.csproj`, and does not require the Microsoft .NET SDK.
 
 Build Debug or Release in Visual Studio, then use Start Without Debugging to
