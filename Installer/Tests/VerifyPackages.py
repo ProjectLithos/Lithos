@@ -13,7 +13,7 @@ import xml.etree.ElementTree as element_tree
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -39,6 +39,11 @@ def verify() -> None:
     assert manifest["sdkVersion"] == VERSION
     assert manifest["releaseStatus"] == "ready"
     assert len(manifest["packages"]) == 4
+    assert manifest["visualStudio"]["projectTemplates"] == [
+        "VisualStudio/ProjectTemplates/OESDKKernel.zip",
+        "VisualStudio/ProjectTemplates/OESDKDesktop.zip",
+    ]
+    assert "vsix" not in manifest["visualStudio"]
 
     installed_paths: set[str] = set()
     for package in manifest["packages"]:
@@ -75,6 +80,11 @@ def verify() -> None:
         assert ".vcxproj" in generator
         assert "Microsoft.NET.Sdk" not in generator
         assert "($ProjectName + '.csproj')" not in generator
+        repair = archive.read("Tools/Repair-OESDKTemplates.ps1").decode("utf-8")
+        assert "*OESDK*.zip" in repair
+        assert "Visual Studio 2022\\Templates\\ProjectTemplates" in repair
+        assert "OESDKKernel.zip" in repair and "OESDKDesktop.zip" in repair
+        assert "VSIX installation failed" not in repair
 
     qemu_path = ASSETS / "OESDK-QEMU-x86_64.zip"
     with zipfile.ZipFile(qemu_path) as archive:
@@ -86,6 +96,16 @@ def verify() -> None:
     with zipfile.ZipFile(visual_path) as package:
         names = safe_members(package)
         assert "VisualStudio/OESDK.VisualStudio.vsix" in names
+        assert "VisualStudio/ProjectTemplates/OESDKKernel.zip" in names
+        assert "VisualStudio/ProjectTemplates/OESDKDesktop.zip" in names
+        for direct_template, project_name in (
+            ("VisualStudio/ProjectTemplates/OESDKKernel.zip", "OESDKKernel.vcxproj"),
+            ("VisualStudio/ProjectTemplates/OESDKDesktop.zip", "OESDKDesktop.vcxproj"),
+        ):
+            with open_nested(package, direct_template) as template:
+                direct_names = safe_members(template)
+                assert project_name in direct_names
+                assert any(name.endswith(".vstemplate") for name in direct_names)
         with open_nested(package, "VisualStudio/OESDK.VisualStudio.vsix") as vsix:
             vsix_names = safe_members(vsix)
             assert "extension.vsixmanifest" in vsix_names
@@ -105,8 +125,8 @@ def verify() -> None:
                     vstemplate_name = next(name for name in template_names if name.endswith(".vstemplate"))
                     template_xml = template.read(vstemplate_name)
                     element_tree.fromstring(template_xml)
-                    assert b"OESDK 0.0.7 - Clang C" in template_xml
-                    assert b"ProjectLithos.OESDK.v007" in template_xml
+                    assert b"OESDK 0.0.8 - Clang C" in template_xml
+                    assert b"ProjectLithos.OESDK.v008" in template_xml
                     assert b"Microsoft.NET.Sdk" not in template_xml
                     project = template.read(project_name).decode("utf-8")
                     assert "Build-Kernel.ps1" in project and "Run-Qemu.ps1" in project
@@ -122,7 +142,7 @@ def verify() -> None:
 
     print("[ OK ] Four manifest packages exist and all SHA-256 values match")
     print("[ OK ] Core runtime, x86-64 boot, QEMU integration, and VSIX contents")
-    print("[ OK ] Exactly two versioned native .vcxproj templates contain no .NET SDK project")
+    print("[ OK ] Exactly two native .vcxproj templates are packaged for direct Visual Studio discovery")
     print("[ OK ] Direct native project generator and template repair utility are packaged")
     print("[ OK ] All archives are readable and reject unsafe member paths")
     print("[ OK ] Package extraction paths are unique across the staging area")

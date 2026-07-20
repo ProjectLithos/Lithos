@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ProjectLithos.OESDK.VisualStudio" Version="0.0.7" Language="en-US" Publisher="Project Lithos" />
-    <DisplayName>OESDK 0.0.7 Native Clang C Project Templates</DisplayName>
+    <Identity Id="ProjectLithos.OESDK.VisualStudio" Version="0.0.8" Language="en-US" Publisher="Project Lithos" />
+    <DisplayName>OESDK 0.0.8 Native Clang C Project Templates</DisplayName>
     <Description xml:space="preserve">Two native .vcxproj templates for Clang C and QEMU. These templates do not use C# or .NET.</Description>
   </Metadata>
   <Installation>

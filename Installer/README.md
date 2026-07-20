@@ -1,4 +1,4 @@
-# OESDK Online Installer and SDK Packages 0.0.7
+# OESDK Online Installer and SDK Packages 0.0.8
 
 This source tree builds the small OESDK Windows bootstrapper and the first
 downloadable SDK package set. The installer reads its manifest directly from:
@@ -16,17 +16,18 @@ https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/manifest.j
   template-repair utility.
 - **QEMU**: automatic QEMU installation through Windows Package Manager and
   machine-wide `OESDK_QEMU` configuration.
-- **Visual Studio**: a VSIX containing exactly two versioned native `.vcxproj`
-  templates: **OESDK 0.0.7 - Clang C Kernel (no .NET)** and **OESDK 0.0.7 -
-  Clang C Desktop OS (no .NET)**.
+- **Visual Studio**: exactly two versioned native `.vcxproj` templates:
+  **OESDK 0.0.8 - Clang C Kernel (no .NET)** and **OESDK 0.0.8 - Clang C
+  Desktop OS (no .NET)**. Setup places them directly in Visual Studio 2022's
+  per-user project-template directory.
 
 The generated package archives live in `ReleaseAssets`. They are downloaded
-separately, keeping `OESDK-Setup-0.0.7-x64.exe` small.
+separately, keeping `OESDK-Setup-0.0.8-x64.exe` small.
 
-Version 0.0.7 removes obsolete OESDK VSIX registrations, rebuilds Visual
-Studio's project-template cache, and gives both templates unique versioned
-identities. It also supplies `New-OESDKProject.bat`, which bypasses the Visual
-Studio template cache entirely and always creates a native `.vcxproj`.
+Version 0.0.8 is a clean replacement. After verifying the new downloads, setup
+removes the old OESDK installation, all OESDK VSIX registrations, and all old
+OESDK template ZIPs. It then installs exactly two new templates directly into
+Visual Studio's user-template directory and rebuilds the catalogue.
 
 ## User experience
 
@@ -36,9 +37,10 @@ Studio template cache entirely and always creates a native `.vcxproj`.
    Community from Microsoft.
 4. It adds the native C/C++ and Clang/LLVM components.
 5. It installs QEMU through `winget` when QEMU is absent.
-6. It removes stale OESDK VSIX registrations, installs the current VSIX, and
-   rebuilds Visual Studio's template cache.
-7. In Visual Studio, select one of the two OESDK 0.0.7 native templates, build
+6. It removes all previous OESDK SDK files, VSIX registrations, and templates.
+7. It installs the two current template ZIPs directly into Visual Studio and
+   rebuilds its project-template catalogue.
+8. In Visual Studio, select one of the two OESDK 0.0.8 native templates, build
    it, and use **Start Without
    Debugging** to launch the resulting `kernel.elf` in QEMU.
 

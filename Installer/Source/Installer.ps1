@@ -177,42 +177,67 @@ function Ensure-VisualStudioSupport {
     return $vsPath
 }
 
+function Remove-OESDKVisualStudioSupport {
+    param([string]$VsPath, $StatusLabel)
+    $vsixInstaller = Join-Path $VsPath 'Common7\IDE\VSIXInstaller.exe'
+    if (-not (Test-Path $vsixInstaller)) { throw "The Visual Studio extension installer is missing: $vsixInstaller" }
+    if (Get-Process -Name devenv -ErrorAction SilentlyContinue) {
+        throw 'Close every Visual Studio window, then run OESDK Setup again. Visual Studio must be closed while every older OESDK template is removed.'
+    }
+
+    $StatusLabel.Text = 'Removing every previous OESDK Visual Studio registration...'
+    [Windows.Forms.Application]::DoEvents()
+    $extensionIds = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    [void]$extensionIds.Add('ProjectLithos.OESDK.VisualStudio')
+    $extensionRoot = Join-Path $env:LOCALAPPDATA 'Microsoft\VisualStudio'
+    if (Test-Path $extensionRoot) {
+        foreach ($manifestPath in Get-ChildItem -LiteralPath $extensionRoot -Filter 'extension.vsixmanifest' -File -Recurse -ErrorAction SilentlyContinue) {
+            try {
+                $text = [IO.File]::ReadAllText($manifestPath.FullName)
+                if ($text -match '(?i)OESDK' -and $text -match '(?i)<Identity\s+[^>]*Id="([^"]+)"') {
+                    [void]$extensionIds.Add($Matches[1])
+                }
+            } catch { }
+        }
+    }
+    foreach ($extensionId in $extensionIds) {
+        $uninstall = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', "/uninstall:$extensionId") -Wait -PassThru
+        # A nonzero result also means that this older identity was not installed.
+    }
+
+    $documents = [Environment]::GetFolderPath('MyDocuments')
+    if ([string]::IsNullOrWhiteSpace($documents)) { throw 'The Windows Documents folder could not be located.' }
+    $projectTemplatesRoot = Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates'
+    $ownedTemplateRoot = Join-Path $projectTemplatesRoot 'OESDK'
+    if (Test-Path -LiteralPath $ownedTemplateRoot) {
+        Remove-Item -LiteralPath $ownedTemplateRoot -Recurse -Force
+    }
+    if (Test-Path -LiteralPath $projectTemplatesRoot) {
+        foreach ($oldTemplate in Get-ChildItem -LiteralPath $projectTemplatesRoot -Filter '*OESDK*.zip' -File -Recurse -ErrorAction SilentlyContinue) {
+            Remove-Item -LiteralPath $oldTemplate.FullName -Force
+        }
+    }
+}
+
 function Install-VisualStudioExtension {
     param($Manifest, [string]$InstallRoot, [string]$VsPath, $StatusLabel)
-    if ($Manifest.visualStudio -and $Manifest.visualStudio.vsix) {
-        $vsixPath = Get-SafeDestination $InstallRoot ([string]$Manifest.visualStudio.vsix)
-        $vsixInstaller = Join-Path $VsPath 'Common7\IDE\VSIXInstaller.exe'
-        if (-not (Test-Path $vsixPath)) { throw "The Visual Studio extension is missing: $vsixPath" }
-        if (-not (Test-Path $vsixInstaller)) { throw "The Visual Studio extension installer is missing: $vsixInstaller" }
-        if (Get-Process -Name devenv -ErrorAction SilentlyContinue) {
-            throw 'Close every Visual Studio window, then run OESDK Setup again. Visual Studio must be closed while its old OESDK templates are removed.'
+    if ($Manifest.visualStudio) {
+
+        if (-not $Manifest.visualStudio.projectTemplates -or @($Manifest.visualStudio.projectTemplates).Count -ne 2) {
+            throw 'The OESDK manifest must specify exactly two Visual Studio project templates.'
         }
 
-        $StatusLabel.Text = 'Removing obsolete OESDK template registrations...'
+        $StatusLabel.Text = 'Installing the two OESDK 0.0.8 native Clang C templates...'
         [Windows.Forms.Application]::DoEvents()
-        $extensionIds = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
-        [void]$extensionIds.Add('ProjectLithos.OESDK.VisualStudio')
-        $extensionRoot = Join-Path $env:LOCALAPPDATA 'Microsoft\VisualStudio'
-        if (Test-Path $extensionRoot) {
-            foreach ($manifestPath in Get-ChildItem -LiteralPath $extensionRoot -Filter 'extension.vsixmanifest' -File -Recurse -ErrorAction SilentlyContinue) {
-                try {
-                    $text = [IO.File]::ReadAllText($manifestPath.FullName)
-                    if ($text -match '(?i)OESDK' -and $text -match '(?i)<Identity\s+[^>]*Id="([^"]+)"') {
-                        [void]$extensionIds.Add($Matches[1])
-                    }
-                } catch { }
-            }
+        $documents = [Environment]::GetFolderPath('MyDocuments')
+        $templateRoot = Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates\OESDK'
+        [void][IO.Directory]::CreateDirectory($templateRoot)
+        foreach ($relativeTemplate in @($Manifest.visualStudio.projectTemplates)) {
+            $sourceTemplate = Get-SafeDestination $InstallRoot ([string]$relativeTemplate)
+            if (-not (Test-Path -LiteralPath $sourceTemplate)) { throw "The OESDK project template is missing: $sourceTemplate" }
+            $templateFile = Join-Path $templateRoot ([IO.Path]::GetFileName($sourceTemplate))
+            Copy-Item -LiteralPath $sourceTemplate -Destination $templateFile -Force
         }
-        foreach ($extensionId in $extensionIds) {
-            $uninstall = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', "/uninstall:$extensionId") -Wait -PassThru
-            # A nonzero result also means that this older identity was not installed.
-        }
-
-        $StatusLabel.Text = 'Installing the two OESDK 0.0.7 native Clang C templates...'
-        [Windows.Forms.Application]::DoEvents()
-        $quotedVsixPath = '"' + $vsixPath + '"'
-        $process = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', $quotedVsixPath) -Wait -PassThru
-        if ($process.ExitCode -ne 0) { throw "Visual Studio extension installation failed with code $($process.ExitCode)." }
 
         $devenv = Join-Path $VsPath 'Common7\IDE\devenv.com'
         if (Test-Path $devenv) {
@@ -294,6 +319,25 @@ function Install-OESDK {
         }
         $visualStudioPath = Ensure-VisualStudioSupport $bootstrapVisualStudioManifest $ProgressBar $StatusLabel
 
+        Remove-OESDKVisualStudioSupport $visualStudioPath $StatusLabel
+
+        $installRootPath = [IO.Path]::GetFullPath($InstallRoot)
+        $installDriveRoot = [IO.Path]::GetPathRoot($installRootPath)
+        if ($installRootPath.TrimEnd('\') -eq $installDriveRoot.TrimEnd('\')) {
+            throw 'OESDK cannot clean an installation located at the root of a drive.'
+        }
+        $StatusLabel.Text = 'Removing the previous OESDK installation...'
+        [Windows.Forms.Application]::DoEvents()
+        [Environment]::SetEnvironmentVariable('OESDK_ROOT', $null, 'Machine')
+        $env:OESDK_ROOT = $null
+        if (Test-Path -LiteralPath $installRootPath) {
+            $oldInstall = Get-Item -LiteralPath $installRootPath -Force
+            if (($oldInstall.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw "OESDK will not remove an installation directory that is a link or reparse point: $installRootPath"
+            }
+            Remove-Item -LiteralPath $installRootPath -Recurse -Force
+        }
+
         $StatusLabel.Text = 'Installing OESDK files...'
         [Windows.Forms.Application]::DoEvents()
         [void][IO.Directory]::CreateDirectory($InstallRoot)
@@ -311,7 +355,7 @@ function Install-OESDK {
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.7'
+$form.Text = 'OESDK Setup 0.0.8'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 300)
 $form.FormBorderStyle = 'FixedDialog'
@@ -359,7 +403,7 @@ $installButton.Add_Click({
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.7`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.8`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null

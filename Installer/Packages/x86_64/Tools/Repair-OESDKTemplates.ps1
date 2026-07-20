@@ -17,9 +17,7 @@ if ([string]::IsNullOrWhiteSpace($vsPath)) { throw 'A Visual Studio installation
 $vsixInstaller = Join-Path $vsPath 'Common7\IDE\VSIXInstaller.exe'
 $devenv = Join-Path $vsPath 'Common7\IDE\devenv.com'
 $sdkRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$vsixPath = Join-Path $sdkRoot 'VisualStudio\OESDK.VisualStudio.vsix'
 if (-not (Test-Path -LiteralPath $vsixInstaller)) { throw 'VSIXInstaller.exe could not be found.' }
-if (-not (Test-Path -LiteralPath $vsixPath)) { throw "The installed OESDK VSIX could not be found: $vsixPath" }
 
 $extensionIds = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
 [void]$extensionIds.Add('ProjectLithos.OESDK.VisualStudio')
@@ -40,9 +38,26 @@ foreach ($extensionId in $extensionIds) {
     $uninstall = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', "/uninstall:$extensionId") -Wait -PassThru
 }
 
-Write-Host '[ .. ] Installing the OESDK 0.0.7 native Clang C templates.'
-$install = Start-Process -FilePath $vsixInstaller -ArgumentList @('/quiet', ('"' + $vsixPath + '"')) -Wait -PassThru
-if ($install.ExitCode -ne 0) { throw "VSIX installation failed with code $($install.ExitCode)." }
+$documents = [Environment]::GetFolderPath('MyDocuments')
+if ([string]::IsNullOrWhiteSpace($documents)) { throw 'The Windows Documents folder could not be located.' }
+$projectTemplatesRoot = Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates'
+$ownedTemplateRoot = Join-Path $projectTemplatesRoot 'OESDK'
+if (Test-Path -LiteralPath $ownedTemplateRoot) {
+    Remove-Item -LiteralPath $ownedTemplateRoot -Recurse -Force
+}
+if (Test-Path -LiteralPath $projectTemplatesRoot) {
+    foreach ($oldTemplate in Get-ChildItem -LiteralPath $projectTemplatesRoot -Filter '*OESDK*.zip' -File -Recurse -ErrorAction SilentlyContinue) {
+        Remove-Item -LiteralPath $oldTemplate.FullName -Force
+    }
+}
+
+Write-Host '[ .. ] Installing exactly two OESDK 0.0.8 native Clang C templates.'
+[void][IO.Directory]::CreateDirectory($ownedTemplateRoot)
+foreach ($templateName in @('OESDKKernel.zip', 'OESDKDesktop.zip')) {
+    $sourceTemplate = Join-Path $sdkRoot (Join-Path 'VisualStudio\ProjectTemplates' $templateName)
+    if (-not (Test-Path -LiteralPath $sourceTemplate)) { throw "The installed OESDK template could not be found: $sourceTemplate" }
+    Copy-Item -LiteralPath $sourceTemplate -Destination (Join-Path $ownedTemplateRoot $templateName) -Force
+}
 
 if (Test-Path -LiteralPath $devenv) {
     Write-Host '[ .. ] Rebuilding the Visual Studio template cache.'
@@ -50,4 +65,4 @@ if (Test-Path -LiteralPath $devenv) {
     if ($refresh.ExitCode -ne 0) { throw "Visual Studio template refresh failed with code $($refresh.ExitCode)." }
 }
 
-Write-Host '[ OK ] Template repair finished. Visual Studio should now show exactly two OESDK 0.0.7 templates.'
+Write-Host '[ OK ] Template repair finished. Visual Studio should now show exactly two OESDK 0.0.8 templates.'

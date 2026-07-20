@@ -13,7 +13,7 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PACKAGES = ROOT / "Packages"
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 RAW_BASE = "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets"
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
@@ -59,6 +59,8 @@ def build_visual_studio_package() -> pathlib.Path:
     package_buffer = io.BytesIO()
     with zipfile.ZipFile(package_buffer, "w") as archive:
         add_bytes(archive, "VisualStudio/OESDK.VisualStudio.vsix", vsix_buffer.getvalue())
+        add_bytes(archive, "VisualStudio/ProjectTemplates/OESDKKernel.zip", kernel_template)
+        add_bytes(archive, "VisualStudio/ProjectTemplates/OESDKDesktop.zip", desktop_template)
         add_bytes(archive, "VisualStudio/README.md", (visual_studio / "README.md").read_bytes())
     return write_archive(f"OESDK-VisualStudio-{VERSION}.zip", package_buffer.getvalue())
 
@@ -115,7 +117,10 @@ def build() -> None:
                 "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
                 "Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang",
             ],
-            "vsix": "VisualStudio/OESDK.VisualStudio.vsix",
+            "projectTemplates": [
+                "VisualStudio/ProjectTemplates/OESDKKernel.zip",
+                "VisualStudio/ProjectTemplates/OESDKDesktop.zip",
+            ],
         },
         "qemu": {"ensureScript": "Tools/Ensure-Qemu.ps1"},
     }

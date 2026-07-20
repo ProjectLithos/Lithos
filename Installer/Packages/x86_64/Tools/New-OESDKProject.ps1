@@ -108,7 +108,7 @@ $source = $source.Replace('__PROJECT_NAME__', $ProjectName)
 $readme = @"
 # $ProjectName
 
-This is an OESDK 0.0.7 native Clang C $ProjectType project. It is a `.vcxproj`,
+This is an OESDK 0.0.8 native Clang C $ProjectType project. It is a `.vcxproj`,
 not a C# `.csproj`, and does not require the Microsoft .NET SDK.
 
 Build Debug or Release in Visual Studio, then use Start Without Debugging to
