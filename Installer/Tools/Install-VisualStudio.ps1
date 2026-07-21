@@ -93,7 +93,11 @@ function Install-LocalTemplates {
 }
 
 try {
-    $root = [IO.Path]::GetFullPath($OesdkRoot)
+    $cleanRoot = ([string]$OesdkRoot).Trim().Trim('"')
+    if ([string]::IsNullOrWhiteSpace($cleanRoot)) {
+        throw 'The OESDK installation path was empty.'
+    }
+    $root = [IO.Path]::GetFullPath($cleanRoot)
     if (-not (Test-Path -LiteralPath $root -PathType Container)) {
         throw "OESDK is not installed at $root."
     }

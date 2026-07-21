@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.5",
+  "packageRevision": "0.0.13.6",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
