@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.10",
+  "packageRevision": "0.0.13.11",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -38,5 +38,13 @@
     "visual-studio-setup-script",
     "updater"
   ],
-  "containsCustomExecutable": false
+  "containsCustomExecutable": false,
+  "installedLayout": {
+    "include": "Include",
+    "source": "Source",
+    "architecture": "Architecture",
+    "tools": "Tools",
+    "visualStudio": "VisualStudio",
+    "fullInstallerSource": "InstallerSource"
+  }
 }

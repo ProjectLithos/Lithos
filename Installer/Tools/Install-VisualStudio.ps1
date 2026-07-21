@@ -107,6 +107,8 @@ try {
         throw 'The OESDK installation path was empty.'
     }
     $root = [IO.Path]::GetFullPath($cleanRoot)
+    [Environment]::SetEnvironmentVariable('OESDK_ROOT', $root.TrimEnd('\'), 'User')
+    $env:OESDK_ROOT = $root.TrimEnd('\')
     if (-not (Test-Path -LiteralPath $root -PathType Container)) {
         throw "OESDK is not installed at $root."
     }
@@ -153,7 +155,7 @@ try {
         $message = "OESDK Visual Studio components were installed successfully.`r`n`r`n" + ($warnings -join "`r`n")
         Show-Result $message 'Warning'
     } else {
-        Show-Result 'OESDK Visual Studio components and project templates were installed successfully.'
+        Show-Result 'OESDK Visual Studio components and project templates were installed successfully. Close and reopen Visual Studio so it reads OESDK_ROOT and the refreshed templates.'
     }
     exit 0
 } catch {

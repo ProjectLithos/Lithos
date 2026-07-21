@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "UpdaterVersion=0.0.14.6"
+set "UpdaterVersion=0.0.14.7"
 set "InstallRoot=C:\OESDK"
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"
@@ -136,6 +136,10 @@ echo [ OK ] Continuing to select and extract the latest complete source ZIP.
 goto StagedReady
 
 :StagedReady
+
+rem Release C:\OESDK as the current directory before replacing it.
+if not defined TEMP set "TEMP=%SystemRoot%\Temp"
+cd /d "%TEMP%"
 
 for %%T in (powershell.exe git.exe robocopy.exe) do (
     where %%T >nul 2>nul
