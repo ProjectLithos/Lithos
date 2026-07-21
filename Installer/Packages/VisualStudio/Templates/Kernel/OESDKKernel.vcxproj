@@ -12,6 +12,10 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup>
+    <OESDKRunTool>$(OESDK_ROOT)\Tools\Run-Kernel.ps1</OESDKRunTool>
+    <OESDKDebugTool>$(OESDK_ROOT)\Tools\Debug-Kernel.ps1</OESDKDebugTool>
+  </PropertyGroup>
+  <PropertyGroup>
     <OESDK_ROOT Condition="'$(OESDK_ROOT)'==''">C:\OESDK</OESDK_ROOT>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -30,10 +34,11 @@
     <NMakeIncludeSearchPath>$(OESDK_ROOT)\Include;$(ProjectDir)Include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">__INTELLISENSE__=1;DEBUG=1</NMakePreprocessorDefinitions>
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Release'">__INTELLISENSE__=1</NMakePreprocessorDefinitions>
-    <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Run-Qemu.ps1&quot; -Kernel &quot;$(ProjectDir)Build\$(Configuration)\kernel.elf&quot;</LocalDebuggerCommandArguments>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
+</PropertyGroup>
   <ItemGroup><ClCompile Include="Source\kmain.c" /></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <None Include="Run-Kernel.cmd" />
+    <None Include="Debug-Kernel.cmd" />
+  </ItemGroup>
 </Project>

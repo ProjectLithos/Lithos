@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.12",
+  "packageRevision": "0.0.13.13",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -51,5 +51,12 @@
     "mode": "separate",
     "script": "Tools/Build-LibC.ps1",
     "excludedFromKernelBuild": true
+  },
+  "debugging": {
+    "visualStudioLocalWindowsDebuggerRemoved": true,
+    "guestDebugger": "GDB",
+    "qemuGdbServer": "127.0.0.1:1234",
+    "script": "Tools/Debug-Kernel.ps1",
+    "symbols": "Build/<Configuration>/kernel.elf"
   }
 }
