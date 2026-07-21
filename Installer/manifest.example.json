@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.0.11",
+  "releaseStatus": "ready",
+  "packages": [
+    {
+      "name": "OESDK Core",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-Core-0.0.11.zip",
+      "sha256": "E0F544585D46FFCF9393D59CB2644512B45AF3085C373740EDEF6B78A10EFABB",
+      "destination": "."
+    },
+    {
+      "name": "OESDK x86-64 Support",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-x86_64-0.0.11.zip",
+      "sha256": "A4F24DBE8BE8222CA2565D354B41C9793FA411DE3969B3BF39FBE230097E8FD0",
+      "destination": "."
+    },
+    {
+      "name": "OESDK QEMU x86-64",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-QEMU-x86_64.zip",
+      "sha256": "99BEE22A4445724BBE92F9FEAA5B38E7DF82B1D28DA3065A66734C3E4CA171EE",
+      "destination": "."
+    },
+    {
+      "name": "OESDK Visual Studio Integration",
+      "url": "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets/OESDK-VisualStudio-0.0.11.zip",
+      "sha256": "CAB497ED3FF2A47E0C3F5052E3C653B114E28A8843FE7377F171824550579B24",
+      "destination": "."
+    }
+  ],
+  "visualStudio": {
+    "communityBootstrapperUrl": "https://aka.ms/vs/17/release/vs_community.exe",
+    "components": [
+      "Microsoft.VisualStudio.Workload.NativeDesktop",
+      "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
+      "Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang"
+    ],
+    "projectTemplates": [
+      "VisualStudio/ProjectTemplates/OESDKKernel.zip",
+      "VisualStudio/ProjectTemplates/OESDKDesktop.zip"
+    ]
+  },
+  "qemu": {
+    "ensureScript": "Tools/Ensure-Qemu.ps1"
+  }
+}

@@ -29,5 +29,14 @@
       "path": "ReleaseAssets/OESDK-LibC-Symbols-0.0.13.zip",
       "generatedAfterBuild": true
     }
-  ]
+  ],
+  "packageRevision": "0.0.13.5",
+  "packageType": "complete-script-only",
+  "contains": [
+    "full-source",
+    "libc",
+    "visual-studio-setup-script",
+    "updater"
+  ],
+  "containsCustomExecutable": false
 }
