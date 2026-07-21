@@ -70,3 +70,28 @@ C:\msys64\ucrt64\bin\gdb-multiarch.exe
 ```
 
 Visual Studio's LLDB executable is no longer used as an automatic fallback.
+
+
+## Interactive GDB console
+
+F5 opens a separate console titled:
+
+```text
+OESDK Kernel Debugger - GDB
+```
+
+The console remains open and accepts normal GDB commands. Common commands
+include:
+
+```text
+continue
+break <symbol>
+stepi
+nexti
+info registers
+x/16gx <address>
+backtrace
+disassemble
+```
+
+Closing GDB ends the QEMU debugging session.
