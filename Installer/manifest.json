@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.19",
+  "packageRevision": "0.0.13.20",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -75,5 +75,8 @@
   "visualStudioTemplates": {
     "launchersCopiedIntoNewProjects": true,
     "repairTool": "Tools/Repair-Project-DebugLaunchers.ps1"
+  },
+  "documentation": {
+    "gdbCommandReference": "Docs/GDB-Command-Reference.md"
   }
 }
