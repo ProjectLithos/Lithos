@@ -126,19 +126,35 @@ try {
     }
 
     Install-VisualStudioComponents -Instance $instance
-    Install-LocalTemplates -Root $root
 
-    $defaultsPath = Join-Path $root 'OESDKProjectDefaults.json'
-    if (-not (Test-Path -LiteralPath $defaultsPath)) {
-        [ordered]@{
-            AuthorName = ''
-            AuthorEmail = ''
-            License = 'MIT'
-            SdkVersion = '0.0.13'
-        } | ConvertTo-Json | Set-Content -LiteralPath $defaultsPath -Encoding UTF8
+    $warnings = [System.Collections.Generic.List[string]]::new()
+
+    try {
+        Install-LocalTemplates -Root $root
+    } catch {
+        $warnings.Add("Visual Studio components were installed, but the OESDK templates could not be copied: $($_.Exception.Message)")
     }
 
-    Show-Result 'OESDK Visual Studio components and project templates were installed successfully.'
+    try {
+        $defaultsPath = Join-Path $root 'OESDKProjectDefaults.json'
+        if (-not (Test-Path -LiteralPath $defaultsPath)) {
+            [ordered]@{
+                AuthorName = ''
+                AuthorEmail = ''
+                License = 'MIT'
+                SdkVersion = '0.0.13'
+            } | ConvertTo-Json | Set-Content -LiteralPath $defaultsPath -Encoding UTF8
+        }
+    } catch {
+        $warnings.Add("Visual Studio components were installed, but project defaults could not be written: $($_.Exception.Message)")
+    }
+
+    if ($warnings.Count -gt 0) {
+        $message = "OESDK Visual Studio components were installed successfully.`r`n`r`n" + ($warnings -join "`r`n")
+        Show-Result $message 'Warning'
+    } else {
+        Show-Result 'OESDK Visual Studio components and project templates were installed successfully.'
+    }
     exit 0
 } catch {
     $log = Join-Path $env:TEMP 'OESDK-VisualStudio-Setup.log'
