@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.14",
+  "packageRevision": "0.0.13.15",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -59,6 +59,11 @@
     "script": "Tools/Debug-Kernel.ps1",
     "symbols": "Build/<Configuration>/kernel.elf",
     "visualStudioF5Command": "cmd.exe /c Debug-Kernel.cmd",
-    "elfExecutedAsWin32": false
-  }
+    "elfExecutedAsWin32": false,
+    "fallbackDebugger": "Visual Studio LLDB",
+    "diagnosticLog": "Build/Debug/oesdk-debug.log"
+  },
+  "templatesRemoved": [
+    "*Oryn*"
+  ]
 }

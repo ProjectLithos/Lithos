@@ -39,41 +39,63 @@ function Find-OesdkQemu {
     throw 'QEMU was not found. Run C:\OESDK\Tools\Ensure-Qemu.ps1 first.'
 }
 
-function Find-OesdkGdb {
-    $configured = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'User')
-    if ([string]::IsNullOrWhiteSpace($configured)) {
-        $configured = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'Machine')
+function Find-OesdkDebugger {
+    $configuredGdb = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'User')
+    if ([string]::IsNullOrWhiteSpace($configuredGdb)) {
+        $configuredGdb = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'Machine')
     }
 
     $sdkRoot = Get-OesdkRoot
-    $candidates = @(
-        $configured,
+    $gdbCandidates = @(
+        $configuredGdb,
         (Join-Path $sdkRoot 'Tools\x86_64-elf-gdb.exe'),
         (Join-Path $sdkRoot 'Tools\bin\x86_64-elf-gdb.exe')
     )
 
-    foreach ($candidate in $candidates) {
+    foreach ($candidate in $gdbCandidates) {
         if (-not [string]::IsNullOrWhiteSpace($candidate) -and
             (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-            return [IO.Path]::GetFullPath($candidate)
+            return [pscustomobject]@{ Kind = 'GDB'; Path = [IO.Path]::GetFullPath($candidate) }
         }
     }
 
     foreach ($name in @('x86_64-elf-gdb.exe', 'gdb.exe')) {
         $command = Get-Command $name -ErrorAction SilentlyContinue
         if ($command) {
-            return $command.Source
+            return [pscustomobject]@{ Kind = 'GDB'; Path = $command.Source }
         }
     }
 
+    $configuredLldb = [Environment]::GetEnvironmentVariable('OESDK_LLDB', 'User')
+    if ([string]::IsNullOrWhiteSpace($configuredLldb)) {
+        $configuredLldb = [Environment]::GetEnvironmentVariable('OESDK_LLDB', 'Machine')
+    }
+
+    $vsRoots = @(
+        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin\lldb.exe'),
+        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Professional\VC\Tools\Llvm\x64\bin\lldb.exe'),
+        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\x64\bin\lldb.exe')
+    )
+
+    $lldbCandidates = @($configuredLldb) + $vsRoots
+    foreach ($candidate in $lldbCandidates) {
+        if (-not [string]::IsNullOrWhiteSpace($candidate) -and
+            (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            return [pscustomobject]@{ Kind = 'LLDB'; Path = [IO.Path]::GetFullPath($candidate) }
+        }
+    }
+
+    $lldbCommand = Get-Command lldb.exe -ErrorAction SilentlyContinue
+    if ($lldbCommand) {
+        return [pscustomobject]@{ Kind = 'LLDB'; Path = $lldbCommand.Source }
+    }
+
     throw @'
-A GDB debugger was not found.
+No guest kernel debugger was found.
 
-Install an x86_64-elf GDB build and either:
-  * add it to PATH, or
-  * set OESDK_GDB to its full path.
-
-PowerShell launches the tools; GDB is the kernel debugger.
+Install x86_64-elf-gdb, or install Visual Studio's LLVM/Clang component so
+lldb.exe is available. You may also set OESDK_GDB or OESDK_LLDB to the full
+debugger path.
 '@
 }
 

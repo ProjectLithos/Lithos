@@ -70,6 +70,32 @@ function Install-VisualStudioComponents {
     }
 }
 
+
+function Remove-LegacyOrynTemplates {
+    $documents = [Environment]::GetFolderPath('MyDocuments')
+    if ([string]::IsNullOrWhiteSpace($documents)) {
+        return
+    }
+
+    $templateRoots = @(
+        (Join-Path $documents 'Visual Studio 2022\Templates\ProjectTemplates'),
+        (Join-Path $documents 'Visual Studio 2022\Templates\ItemTemplates')
+    )
+
+    foreach ($templateRoot in $templateRoots) {
+        if (-not (Test-Path -LiteralPath $templateRoot -PathType Container)) {
+            continue
+        }
+
+        Get-ChildItem -LiteralPath $templateRoot -Force -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '(?i)oryn' } |
+            Sort-Object { $_.FullName.Length } -Descending |
+            ForEach-Object {
+                Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
+    }
+}
+
 function Install-LocalTemplates {
     param([string]$Root)
 
@@ -128,6 +154,7 @@ try {
     }
 
     Install-VisualStudioComponents -Instance $instance
+    Remove-LegacyOrynTemplates
 
     $warnings = [System.Collections.Generic.List[string]]::new()
 

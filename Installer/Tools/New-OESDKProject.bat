@@ -13,5 +13,5 @@ exit /b %ERRORLEVEL%
 
 :usage
 echo Usage: New-OESDKProject.bat PROJECT_NAME [Kernel^|Desktop] [DESTINATION]
-echo Example: New-OESDKProject.bat Koryn Kernel "%USERPROFILE%\source\repos"
+echo Example: New-OESDKProject.bat ExampleKernel Kernel "%USERPROFILE%\source\repos"
 exit /b 2

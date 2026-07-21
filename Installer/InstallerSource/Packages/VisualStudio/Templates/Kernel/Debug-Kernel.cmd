@@ -17,4 +17,9 @@ if not exist "%Debugger%" (
 echo [ OK ] Visual Studio is launching the OESDK QEMU/GDB kernel debugger.
 echo [ OK ] Guest kernel: %Kernel%
 powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%Debugger%" -Kernel "%Kernel%" -BreakAt kmain
-exit /b %errorlevel%
+set "DebugExit=%errorlevel%"
+if not "%DebugExit%"=="0" (
+    echo [FAIL] Kernel debugger exited with code %DebugExit%.
+    echo [FAIL] See "%~dp0Build\Debug\oesdk-debug.log".
+)
+exit /b %DebugExit%
