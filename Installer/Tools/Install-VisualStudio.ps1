@@ -5,6 +5,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+
+function Test-IsAdministrator {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
 Add-Type -AssemblyName System.Windows.Forms
 
 function Show-Result([string]$Message, [string]$Icon = 'Information') {
@@ -92,6 +99,9 @@ function Install-LocalTemplates {
 }
 
 try {
+    if (-not (Test-IsAdministrator)) {
+        throw 'Visual Studio setup must be run with administrator permission.'
+    }
     $cleanRoot = ([string]$OesdkRoot).Trim().Trim('"')
     if ([string]::IsNullOrWhiteSpace($cleanRoot)) {
         throw 'The OESDK installation path was empty.'

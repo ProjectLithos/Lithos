@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "UpdaterVersion=0.0.14.3"
+set "UpdaterVersion=0.0.14.4"
 set "InstallRoot=C:\OESDK"
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"
@@ -268,7 +268,7 @@ call :Ok "Validated OESDK %SourceVersion% with LibC and full source."
 
 set "BackupRoot=%WorkRoot%\PreviousOESDK"
 if exist "%InstallRoot%" robocopy.exe "%InstallRoot%" "%BackupRoot%" /E /COPY:DAT /DCOPY:DAT /R:2 /W:1 /NFL /NDL /NJH /NJS >nul
-if exist "%InstallRoot%" rmdir /S /Q "%InstallRoot%"
+if exist "%InstallRoot%" rmdir /S /Q "%InstallRoot%" >nul 2>nul
 mkdir "%InstallRoot%" >nul 2>nul
 robocopy.exe "%PackageRoot%" "%InstallRoot%" /E /COPY:DAT /DCOPY:DAT /R:2 /W:1 /NFL /NDL /NJH /NJS >nul
 if errorlevel 8 (
@@ -398,7 +398,7 @@ set "ExitCode=0"
 goto Cleanup
 
 :RestorePrevious
-if exist "%InstallRoot%" rmdir /S /Q "%InstallRoot%"
+if exist "%InstallRoot%" rmdir /S /Q "%InstallRoot%" >nul 2>nul
 if exist "%BackupRoot%" (
     mkdir "%InstallRoot%" >nul 2>nul
     robocopy.exe "%BackupRoot%" "%InstallRoot%" /E /COPY:DAT /DCOPY:DAT /R:2 /W:1 /NFL /NDL /NJH /NJS >nul
