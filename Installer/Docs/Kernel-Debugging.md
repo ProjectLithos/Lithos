@@ -25,3 +25,14 @@ PATH. The serial output is written beside the kernel as `serial-debug.log`.
 The misleading Visual Studio Local Windows Debugger configuration has been
 removed because that debugger would debug the Windows launcher or QEMU host
 process, not the guest kernel.
+
+
+## Visual Studio F5
+
+For an NMake C++ project, Visual Studio still labels the toolbar launcher
+"Local Windows Debugger". OESDK overrides its command so that F5 runs
+`Debug-Kernel.cmd` instead of trying to execute `kernel.elf`.
+
+The Windows debugger only launches the command wrapper. QEMU runs the guest and
+GDB performs the actual kernel debugging. The ELF is never executed as a Win32
+program.
