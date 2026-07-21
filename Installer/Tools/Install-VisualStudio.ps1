@@ -50,7 +50,6 @@ function Install-VisualStudioComponents {
         'modify',
         '--installPath', ('"' + [string]$Instance.installationPath + '"'),
         '--passive',
-        '--wait',
         '--norestart',
         '--includeRecommended',
         '--add', 'Microsoft.VisualStudio.Workload.NativeDesktop',
