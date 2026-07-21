@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.16",
+  "packageRevision": "0.0.13.17",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -66,5 +66,9 @@
   },
   "templatesRemoved": [
     "*Oryn*"
-  ]
+  ],
+  "visualStudioTemplates": {
+    "launchersCopiedIntoNewProjects": true,
+    "repairTool": "Tools/Repair-Project-DebugLaunchers.ps1"
+  }
 }

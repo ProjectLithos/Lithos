@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>OESDK 0.0.11 - Clang C Kernel (no .NET)</Name>
+    <Name>OESDK 0.0.13 - Clang C Kernel (no .NET)</Name>
     <Description>The native x86-64 OESDK kernel template. Creates a .vcxproj using Clang C and QEMU; it does not use C# or .NET.</Description>
     <ProjectType>VC</ProjectType>
     <DefaultName>LithosClangKernel</DefaultName>
     <SortOrder>10</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <TemplateID>ProjectLithos.OESDK.v0011.Kernel.ClangC</TemplateID>
+    <TemplateID>ProjectLithos.OESDK.v0013.Kernel.ClangC</TemplateID>
   </TemplateData>
   <TemplateContent>
     <Project File="OESDKKernel.vcxproj" TargetFileName="$safeprojectname$.vcxproj" ReplaceParameters="true">
@@ -16,6 +16,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="kmain.c">kmain.c</ProjectItem>
       </Folder>
       <ProjectItem ReplaceParameters="false" TargetFileName="README.md">README.md</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Run-Kernel.cmd">Run-Kernel.cmd</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Debug-Kernel.cmd">Debug-Kernel.cmd</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>
