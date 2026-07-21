@@ -154,6 +154,14 @@ try {
     }
 
     Install-VisualStudioComponents -Instance $instance
+    $gdbInstaller = Join-Path $root 'Tools\Ensure-Gdb.ps1'
+    if (Test-Path -LiteralPath $gdbInstaller -PathType Leaf) {
+        & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $gdbInstaller -Quiet
+        if ($LASTEXITCODE -ne 0) {
+            throw "OESDK GDB installation failed with exit code $LASTEXITCODE."
+        }
+    }
+
     Remove-LegacyOrynTemplates
 
     $warnings = [System.Collections.Generic.List[string]]::new()

@@ -58,3 +58,15 @@ The guest debugger writes:
 ```text
 Build\Debug\oesdk-debug.log
 ```
+
+
+## GNU debugger installation
+
+OESDK uses GDB for QEMU guest debugging. Setup installs MSYS2 and the
+`mingw-w64-ucrt-x86_64-gdb-multiarch` package. The expected debugger is:
+
+```text
+C:\msys64\ucrt64\bin\gdb-multiarch.exe
+```
+
+Visual Studio's LLDB executable is no longer used as an automatic fallback.

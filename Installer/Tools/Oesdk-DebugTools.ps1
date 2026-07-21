@@ -40,63 +40,58 @@ function Find-OesdkQemu {
 }
 
 function Find-OesdkDebugger {
-    $configuredGdb = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'User')
-    if ([string]::IsNullOrWhiteSpace($configuredGdb)) {
-        $configuredGdb = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'Machine')
+    $configured = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'User')
+    if ([string]::IsNullOrWhiteSpace($configured)) {
+        $configured = [Environment]::GetEnvironmentVariable('OESDK_GDB', 'Machine')
     }
 
     $sdkRoot = Get-OesdkRoot
-    $gdbCandidates = @(
-        $configuredGdb,
+    $candidates = @(
+        $configured,
+        'C:\msys64\ucrt64\bin\gdb-multiarch.exe',
+        'C:\msys64\ucrt64\bin\gdb.exe',
         (Join-Path $sdkRoot 'Tools\x86_64-elf-gdb.exe'),
         (Join-Path $sdkRoot 'Tools\bin\x86_64-elf-gdb.exe')
     )
 
-    foreach ($candidate in $gdbCandidates) {
-        if (-not [string]::IsNullOrWhiteSpace($candidate) -and
-            (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-            return [pscustomobject]@{ Kind = 'GDB'; Path = [IO.Path]::GetFullPath($candidate) }
+    foreach ($candidate in $candidates) {
+        if ([string]::IsNullOrWhiteSpace($candidate) -or
+            -not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            continue
+        }
+
+        & $candidate --version *> $null
+        if ($LASTEXITCODE -eq 0) {
+            return [pscustomobject]@{
+                Kind = 'GDB'
+                Path = [IO.Path]::GetFullPath($candidate)
+            }
         }
     }
 
-    foreach ($name in @('x86_64-elf-gdb.exe', 'gdb.exe')) {
+    foreach ($name in @('gdb-multiarch.exe', 'x86_64-elf-gdb.exe', 'gdb.exe')) {
         $command = Get-Command $name -ErrorAction SilentlyContinue
         if ($command) {
-            return [pscustomobject]@{ Kind = 'GDB'; Path = $command.Source }
+            & $command.Source --version *> $null
+            if ($LASTEXITCODE -eq 0) {
+                return [pscustomobject]@{
+                    Kind = 'GDB'
+                    Path = $command.Source
+                }
+            }
         }
     }
 
-    $configuredLldb = [Environment]::GetEnvironmentVariable('OESDK_LLDB', 'User')
-    if ([string]::IsNullOrWhiteSpace($configuredLldb)) {
-        $configuredLldb = [Environment]::GetEnvironmentVariable('OESDK_LLDB', 'Machine')
-    }
+    $installer = Join-Path $sdkRoot 'Tools\Ensure-Gdb.ps1'
+    throw @"
+A working GNU debugger was not found.
 
-    $vsRoots = @(
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin\lldb.exe'),
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Professional\VC\Tools\Llvm\x64\bin\lldb.exe'),
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\x64\bin\lldb.exe')
-    )
+Run:
+  powershell.exe -ExecutionPolicy Bypass -File "$installer"
 
-    $lldbCandidates = @($configuredLldb) + $vsRoots
-    foreach ($candidate in $lldbCandidates) {
-        if (-not [string]::IsNullOrWhiteSpace($candidate) -and
-            (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-            return [pscustomobject]@{ Kind = 'LLDB'; Path = [IO.Path]::GetFullPath($candidate) }
-        }
-    }
-
-    $lldbCommand = Get-Command lldb.exe -ErrorAction SilentlyContinue
-    if ($lldbCommand) {
-        return [pscustomobject]@{ Kind = 'LLDB'; Path = $lldbCommand.Source }
-    }
-
-    throw @'
-No guest kernel debugger was found.
-
-Install x86_64-elf-gdb, or install Visual Studio's LLVM/Clang component so
-lldb.exe is available. You may also set OESDK_GDB or OESDK_LLDB to the full
-debugger path.
-'@
+Visual Studio LLDB is not used because the installed lldb.exe can fail with
+Windows loader error 0xC0000135 when its dependent DLLs are unavailable.
+"@
 }
 
 function Resolve-OesdkKernel {

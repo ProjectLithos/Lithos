@@ -22,29 +22,17 @@ try {
     $commandFile = Join-Path $env:TEMP ("OESDK-Debug-{0}.cmd" -f [Guid]::NewGuid().ToString('N'))
     $escapedKernel = $kernelPath.Replace('\', '/').Replace('"', '\"')
 
-    if ($debugger.Kind -eq 'GDB') {
-        $commands = @(
-            'set confirm off',
-            'set pagination off',
-            'set disassembly-flavor intel',
-            ('file "' + $escapedKernel + '"'),
-            ('target remote 127.0.0.1:' + $Port)
-        )
-        if (-not [string]::IsNullOrWhiteSpace($BreakAt)) {
-            $commands += ('break ' + $BreakAt)
-        }
-        $commands += 'continue'
-    } else {
-        $commands = @(
-            'settings set auto-confirm true',
-            ('target create "' + $escapedKernel + '"'),
-            ('gdb-remote 127.0.0.1:' + $Port)
-        )
-        if (-not [string]::IsNullOrWhiteSpace($BreakAt)) {
-            $commands += ('breakpoint set --name ' + $BreakAt)
-        }
-        $commands += 'continue'
+    $commands = @(
+        'set confirm off',
+        'set pagination off',
+        'set disassembly-flavor intel',
+        ('file "' + $escapedKernel + '"'),
+        ('target remote 127.0.0.1:' + $Port)
+    )
+    if (-not [string]::IsNullOrWhiteSpace($BreakAt)) {
+        $commands += ('break ' + $BreakAt)
     }
+    $commands += 'continue'
 
     [IO.File]::WriteAllLines($commandFile, $commands, [Text.Encoding]::ASCII)
 
@@ -73,13 +61,8 @@ try {
             throw "QEMU exited before the debugger connected. Exit code: $($qemuProcess.ExitCode)."
         }
 
-        if ($debugger.Kind -eq 'GDB') {
-            & $debugger.Path '-x' $commandFile 2>&1 |
-                Tee-Object -FilePath $debugLog -Append
-        } else {
-            & $debugger.Path '-s' $commandFile 2>&1 |
-                Tee-Object -FilePath $debugLog -Append
-        }
+        & $debugger.Path '-x' $commandFile 2>&1 |
+            Tee-Object -FilePath $debugLog -Append
 
         $debuggerExit = $LASTEXITCODE
         if ($debuggerExit -ne 0) {
