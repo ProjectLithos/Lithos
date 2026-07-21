@@ -86,11 +86,34 @@ $common = @(
     '-g', '-isystem', $includeRoot
 ) + $definitions
 
-$sources = @(
-    Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'Source') -Filter '*.c' -File -Recurse
-    Get-ChildItem -LiteralPath (Join-Path $projectRoot 'Source') -Filter '*.c' -File -Recurse
+$sdkSourceRoot = Join-Path $sdkRoot 'Source'
+$libcSourceRoot = Join-Path $sdkSourceRoot 'LibC'
+$projectSourceRoot = Join-Path $projectRoot 'Source'
+
+# LibC is a separate Newlib target library. It must not be compiled into every
+# freestanding kernel because its port sources require the built Newlib target
+# headers and runtime. Kernel builds use only the core OESDK runtime sources.
+$sdkSources = @(
+    Get-ChildItem -LiteralPath $sdkSourceRoot -Filter '*.c' -File -Recurse |
+        Where-Object {
+            -not $_.FullName.StartsWith(
+                $libcSourceRoot.TrimEnd('\') + '\',
+                [StringComparison]::OrdinalIgnoreCase
+            )
+        }
 )
+
+$projectSources = @()
+if (Test-Path -LiteralPath $projectSourceRoot -PathType Container) {
+    $projectSources = @(
+        Get-ChildItem -LiteralPath $projectSourceRoot -Filter '*.c' -File -Recurse
+    )
+}
+
+$sources = @($sdkSources) + @($projectSources)
 if ($sources.Count -eq 0) { throw 'No C source files were found.' }
+
+Write-Host "OESDK kernel sources: $($sdkSources.Count); project sources: $($projectSources.Count); LibC excluded."
 
 $objects = New-Object System.Collections.Generic.List[string]
 $index = 0
@@ -107,7 +130,7 @@ Write-Host "Clang ASM $bootSource"
 & $clang @common -c $bootSource -o $bootObject
 if ($LASTEXITCODE -ne 0) { throw 'Clang failed for the x86-64 boot source.' }
 
-$sdkSourceCount = @(Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'Source') -Filter '*.c' -File -Recurse).Count
+$sdkSourceCount = $sdkSources.Count
 $library = Join-Path $outputRoot 'liboesdk.a'
 $sdkObjects = @($objects | Select-Object -First $sdkSourceCount)
 & $archiver rcs $library @sdkObjects

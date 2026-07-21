@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.11",
+  "packageRevision": "0.0.13.12",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -46,5 +46,10 @@
     "tools": "Tools",
     "visualStudio": "VisualStudio",
     "fullInstallerSource": "InstallerSource"
+  },
+  "libcBuild": {
+    "mode": "separate",
+    "script": "Tools/Build-LibC.ps1",
+    "excludedFromKernelBuild": true
   }
 }
