@@ -38,7 +38,7 @@
   <ItemGroup><ClCompile Include="Source\kmain.c" /></ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(ComSpec)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>/D /S /C &quot;&quot;$(ProjectDir)Debug-Kernel.cmd&quot;&quot;</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/D /C call &quot;$(ProjectDir)Debug-Kernel.cmd&quot;</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>

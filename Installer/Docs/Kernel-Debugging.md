@@ -36,3 +36,25 @@ For an NMake C++ project, Visual Studio still labels the toolbar launcher
 The Windows debugger only launches the command wrapper. QEMU runs the guest and
 GDB performs the actual kernel debugging. The ELF is never executed as a Win32
 program.
+
+
+## F5 launcher diagnostics
+
+The Visual Studio F5 command now uses:
+
+```text
+cmd.exe /D /C call "<ProjectDir>\Debug-Kernel.cmd"
+```
+
+This avoids the nested quote parsing that could cause `cmd.exe` to exit before
+the launcher ran. The launcher writes:
+
+```text
+Build\Debug\oesdk-launcher.log
+```
+
+The guest debugger writes:
+
+```text
+Build\Debug\oesdk-debug.log
+```

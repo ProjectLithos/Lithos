@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.15",
+  "packageRevision": "0.0.13.16",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -58,10 +58,11 @@
     "qemuGdbServer": "127.0.0.1:1234",
     "script": "Tools/Debug-Kernel.ps1",
     "symbols": "Build/<Configuration>/kernel.elf",
-    "visualStudioF5Command": "cmd.exe /c Debug-Kernel.cmd",
+    "visualStudioF5Command": "cmd.exe /D /C call \"<ProjectDir>\\Debug-Kernel.cmd\"",
     "elfExecutedAsWin32": false,
     "fallbackDebugger": "Visual Studio LLDB",
-    "diagnosticLog": "Build/Debug/oesdk-debug.log"
+    "diagnosticLog": "Build/Debug/oesdk-debug.log",
+    "launcherLog": "Build/Debug/oesdk-launcher.log"
   },
   "templatesRemoved": [
     "*Oryn*"
