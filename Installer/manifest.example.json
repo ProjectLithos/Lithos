@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.13",
+  "sdkVersion": "0.17.14",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.13",
+  "packageRevision": "0.17.14",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -85,9 +85,10 @@
     "gdtAndTss": "Docs/GDT-and-TSS.md",
     "idtAndExceptions": "Docs/IDT-and-Exceptions.md",
     "apiReference": "Docs/API/README.md",
-    "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py"
+    "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
+    "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md"
   },
-  "visualStudioSdkVersion": "0.17.13",
+  "visualStudioSdkVersion": "0.17.14",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -138,5 +139,15 @@
       "nmi",
       "machine-check"
     ]
+  },
+  "memoryMapNormalization": {
+    "architectureIndependentTypes": 8,
+    "maximumRegions": 256,
+    "rangeModel": "half-open",
+    "overflowValidation": true,
+    "overlapDetection": true,
+    "multiboot1Conversion": true,
+    "sorting": true,
+    "adjacentRegionCoalescing": true
   }
 }

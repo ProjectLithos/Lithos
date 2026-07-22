@@ -14,10 +14,11 @@
 #include <oesdk/status.h>
 #include <oesdk/gdt.h>
 #include <oesdk/interrupt.h>
+#include <oesdk/memory_map.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 17
-#define OESDK_VERSION_PATCH 13
+#define OESDK_VERSION_PATCH 14
 #define OESDK_VERSION_REVISION 0
 
 #endif

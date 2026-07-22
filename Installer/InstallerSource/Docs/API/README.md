@@ -143,3 +143,21 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [OESDK_PAGE_FAULT_SHADOW_STACK_BIT](OESDK_PAGE_FAULT_SHADOW_STACK_BIT.md)
 
 - [OESDK_PAGE_FAULT_SGX_BIT](OESDK_PAGE_FAULT_SGX_BIT.md)
+
+- [`OesdkMemoryType`](./OesdkMemoryType.md)
+
+- [`OesdkMemoryRegion`](./OesdkMemoryRegion.md)
+
+- [`OesdkMemoryRangeEnd`](./OesdkMemoryRangeEnd.md)
+
+- [`OesdkMemoryRangeIsValid`](./OesdkMemoryRangeIsValid.md)
+
+- [`OesdkMemoryRangesOverlap`](./OesdkMemoryRangesOverlap.md)
+
+- [`OesdkMemoryTypeFromMultiboot1`](./OesdkMemoryTypeFromMultiboot1.md)
+
+- [`OesdkMemoryMapNormalizeMultiboot1`](./OesdkMemoryMapNormalizeMultiboot1.md)
+
+- [`OesdkMemoryMapRegions`](./OesdkMemoryMapRegions.md)
+
+- [`OesdkMemoryMapRegionCount`](./OesdkMemoryMapRegionCount.md)
