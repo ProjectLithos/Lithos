@@ -5,6 +5,9 @@ extern void kmain(int argc, char *argv);
 
 __attribute__((noreturn)) void oesdk_runtime_start(uint32_t multiboot_magic, uintptr_t multiboot_information) {
     oesdk_serial_initialize();
+    if (!OesdkCpuInitialize()) {
+        OesdkPanic("CPU", "x86-64 long mode is unavailable", 0x0000000000000011ULL);
+    }
     if (!OesdkBootContextInitialize(multiboot_magic, multiboot_information)) {
         kdebugf("[FAIL] OESDK Boot Context initialization failed.\n");
         for (;;) __asm__ volatile ("cli; hlt");

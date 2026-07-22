@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.16.1",
+  "packageRevision": "0.0.16.2",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -79,6 +79,7 @@
   "documentation": {
     "gdbCommandReference": "Docs/GDB-Command-Reference.md",
     "bootContext": "Docs/Boot-Context.md",
-    "panicAndAssertions": "Docs/Panic-and-Assertions.md"
+    "panicAndAssertions": "Docs/Panic-and-Assertions.md",
+    "cpuPrimitives": "Docs/CPU-Primitives.md"
   }
 }
