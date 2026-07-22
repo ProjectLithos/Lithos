@@ -33,6 +33,8 @@ typedef struct OesdkHandlerSlot {
 _Static_assert(sizeof(OesdkIdtGate) == 16U, "IDT gates must be 16 bytes");
 _Static_assert(__builtin_offsetof(OesdkInterruptFrame, Vector) == 120U, "interrupt frame register layout changed");
 _Static_assert(__builtin_offsetof(OesdkInterruptFrame, Rip) == 136U, "interrupt frame CPU layout changed");
+_Static_assert(__builtin_offsetof(OesdkInterruptFrame, Rsp) == 160U, "interrupt frame stack layout changed");
+_Static_assert(sizeof(OesdkInterruptFrame) == 176U, "interrupt frame size changed");
 
 extern void (*OesdkInterruptStubTable[OESDK_IDT_VECTOR_COUNT])(void);
 static OesdkIdtGate OesdkIdt[OESDK_IDT_VECTOR_COUNT] __attribute__((aligned(16)));
@@ -95,6 +97,9 @@ void OesdkInterruptFrameDump(const OesdkInterruptFrame *Frame) {
     oesdk_serial_printf("\n[FAIL] Interrupt frame\n");
     kprintf("\n[FAIL] Interrupt frame\n");
     OesdkPrintRegister("RIP", Frame->Rip); OesdkPrintRegister("CS", Frame->Cs); OesdkPrintRegister("RFLAGS", Frame->Rflags);
+    if ((Frame->Cs & UINT64_C(3)) != 0U || Frame->Vector == 2U || Frame->Vector == 8U || Frame->Vector == 18U) {
+        OesdkPrintRegister("RSP", Frame->Rsp); OesdkPrintRegister("SS", Frame->Ss);
+    }
     oesdk_serial_write("\n"); kputc('\n');
     OesdkPrintRegister("RAX", Frame->Rax); OesdkPrintRegister("RBX", Frame->Rbx); OesdkPrintRegister("RCX", Frame->Rcx); OesdkPrintRegister("RDX", Frame->Rdx);
     oesdk_serial_write("\n"); kputc('\n');
@@ -108,8 +113,34 @@ void OesdkInterruptFrameDump(const OesdkInterruptFrame *Frame) {
     oesdk_serial_write("\n"); kputc('\n');
 }
 
-static void OesdkPageFaultDump(const OesdkInterruptFrame *Frame) {
+static void OesdkFatalException(OesdkInterruptFrame *Frame, const char *Reason) {
+    if (Frame == NULL) {
+        OesdkPanic("Exception", "Missing interrupt frame", OESDK_EXCEPTION_PANIC_BASE);
+    }
+    oesdk_serial_printf("\n[FAIL] CPU exception %llu: %s\n", Frame->Vector, Reason);
+    kprintf("\n[FAIL] CPU exception %llu: %s\n", Frame->Vector, Reason);
+    OesdkInterruptFrameDump(Frame);
+    OesdkPanic("Exception", Reason, OESDK_EXCEPTION_PANIC_BASE | (Frame->Vector & UINT64_C(0xFF)));
+}
+
+void OesdkDivideErrorHandler(OesdkInterruptFrame *Frame) {
+    OesdkFatalException(Frame, "Divide Error");
+}
+
+void OesdkInvalidOpcodeHandler(OesdkInterruptFrame *Frame) {
+    OesdkFatalException(Frame, "Invalid Opcode");
+}
+
+void OesdkGeneralProtectionFaultHandler(OesdkInterruptFrame *Frame) {
+    OesdkFatalException(Frame, "General Protection Fault");
+}
+
+void OesdkPageFaultHandler(OesdkInterruptFrame *Frame) {
+    if (Frame == NULL) {
+        OesdkPanic("Exception", "Missing page-fault frame", OESDK_EXCEPTION_PANIC_BASE | UINT64_C(14));
+    }
     OesdkPageFaultInformation Fault = OesdkPageFaultDecode(OesdkCpuReadCr2(), Frame->ErrorCode);
+    oesdk_serial_printf("\n[FAIL] CPU exception 14: Page Fault\n");
     oesdk_serial_printf("[FAIL] Page fault address: 0x%016llX\n", (uint64_t)Fault.Address);
     oesdk_serial_printf("[FAIL] Cause: %s, %s, %s%s%s%s%s%s\n",
         Fault.PresentViolation ? "protection violation" : "non-present page",
@@ -120,6 +151,7 @@ static void OesdkPageFaultDump(const OesdkInterruptFrame *Frame) {
         Fault.ProtectionKeyViolation ? ", protection-key" : "",
         Fault.ShadowStackAccess ? ", shadow-stack" : "",
         Fault.SgxViolation ? ", SGX" : "");
+    kprintf("\n[FAIL] CPU exception 14: Page Fault\n");
     kprintf("[FAIL] Page fault address: 0x%016llX\n", (uint64_t)Fault.Address);
     kprintf("[FAIL] Cause: %s, %s, %s%s%s%s%s%s\n",
         Fault.PresentViolation ? "protection violation" : "non-present page",
@@ -130,6 +162,16 @@ static void OesdkPageFaultDump(const OesdkInterruptFrame *Frame) {
         Fault.ProtectionKeyViolation ? ", protection-key" : "",
         Fault.ShadowStackAccess ? ", shadow-stack" : "",
         Fault.SgxViolation ? ", SGX" : "");
+    OesdkInterruptFrameDump(Frame);
+    OesdkPanic("Exception", "Page Fault", OESDK_EXCEPTION_PANIC_BASE | UINT64_C(14));
+}
+
+void OesdkDoubleFaultHandler(OesdkInterruptFrame *Frame) {
+    OesdkFatalException(Frame, "Double Fault");
+}
+
+void OesdkMachineCheckHandler(OesdkInterruptFrame *Frame) {
+    OesdkFatalException(Frame, "Machine Check");
 }
 
 void OesdkInterruptDispatch(OesdkInterruptFrame *Frame) {
@@ -145,11 +187,15 @@ void OesdkInterruptDispatch(OesdkInterruptFrame *Frame) {
 
     if (Frame->Vector >= OESDK_EXCEPTION_VECTOR_COUNT) return;
 
-    oesdk_serial_printf("\n[FAIL] CPU exception %llu: %s\n", Frame->Vector, OesdkExceptionName((uint8_t)Frame->Vector));
-    kprintf("\n[FAIL] CPU exception %llu: %s\n", Frame->Vector, OesdkExceptionName((uint8_t)Frame->Vector));
-    if (Frame->Vector == 14U) OesdkPageFaultDump(Frame);
-    OesdkInterruptFrameDump(Frame);
-    OesdkPanic("Exception", OesdkExceptionName((uint8_t)Frame->Vector), OESDK_EXCEPTION_PANIC_BASE | (Frame->Vector & UINT64_C(0xFF)));
+    switch (Frame->Vector) {
+        case 0U: OesdkDivideErrorHandler(Frame); break;
+        case 6U: OesdkInvalidOpcodeHandler(Frame); break;
+        case 8U: OesdkDoubleFaultHandler(Frame); break;
+        case 13U: OesdkGeneralProtectionFaultHandler(Frame); break;
+        case 14U: OesdkPageFaultHandler(Frame); break;
+        case 18U: OesdkMachineCheckHandler(Frame); break;
+        default: OesdkFatalException(Frame, OesdkExceptionName((uint8_t)Frame->Vector)); break;
+    }
 }
 
 OesdkStatus OesdkIdtInitialize(void) {

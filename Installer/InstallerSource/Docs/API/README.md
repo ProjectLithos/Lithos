@@ -78,6 +78,12 @@ Every public function, function-like macro, and public SDK type has its own Mark
 - [`OesdkInterruptHandlerIsRegistered`](./OesdkInterruptHandlerIsRegistered.md) — function
 - [`OesdkPageFaultDecode`](./OesdkPageFaultDecode.md) — function
 - [`OesdkInterruptFrameDump`](./OesdkInterruptFrameDump.md) — function
+- [`OesdkDivideErrorHandler`](./OesdkDivideErrorHandler.md) — function
+- [`OesdkInvalidOpcodeHandler`](./OesdkInvalidOpcodeHandler.md) — function
+- [`OesdkGeneralProtectionFaultHandler`](./OesdkGeneralProtectionFaultHandler.md) — function
+- [`OesdkPageFaultHandler`](./OesdkPageFaultHandler.md) — function
+- [`OesdkDoubleFaultHandler`](./OesdkDoubleFaultHandler.md) — function
+- [`OesdkMachineCheckHandler`](./OesdkMachineCheckHandler.md) — function
 
 ## LibC Host
 

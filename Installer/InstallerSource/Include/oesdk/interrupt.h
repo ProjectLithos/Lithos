@@ -35,6 +35,8 @@ typedef struct OesdkInterruptFrame {
     uint64_t Rip;
     uint64_t Cs;
     uint64_t Rflags;
+    uint64_t Rsp;
+    uint64_t Ss;
 } OesdkInterruptFrame;
 
 typedef struct OesdkPageFaultInformation {
@@ -67,6 +69,13 @@ OesdkStatus OesdkInterruptHandlerUnregister(uint8_t Vector, OesdkInterruptHandle
 bool OesdkInterruptHandlerIsRegistered(uint8_t Vector);
 OesdkPageFaultInformation OesdkPageFaultDecode(uintptr_t Address, uint64_t ErrorCode);
 void OesdkInterruptFrameDump(const OesdkInterruptFrame *Frame);
+
+void OesdkDivideErrorHandler(OesdkInterruptFrame *Frame);
+void OesdkInvalidOpcodeHandler(OesdkInterruptFrame *Frame);
+void OesdkGeneralProtectionFaultHandler(OesdkInterruptFrame *Frame);
+void OesdkPageFaultHandler(OesdkInterruptFrame *Frame);
+void OesdkDoubleFaultHandler(OesdkInterruptFrame *Frame);
+void OesdkMachineCheckHandler(OesdkInterruptFrame *Frame);
 
 #ifdef __cplusplus
 }
