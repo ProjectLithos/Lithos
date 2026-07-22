@@ -16,6 +16,23 @@ def safe_zip(path: pathlib.Path) -> None:
 def verify() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+    example_path = ROOT / "manifest.example.json"
+    assert example_path.is_file(), "missing manifest.example.json"
+    example_text = example_path.read_text(encoding="utf-8")
+    example = json.loads(example_text)
+    assert "ProjectLithos/Lithos" not in example_text, "manifest example contains obsolete repository"
+    for key in ("schemaVersion", "sdkVersion", "releaseStatus", "packageType",
+                "containsCustomExecutable", "installedLayout", "packages"):
+        assert key in example, f"manifest example missing current-schema key: {key}"
+    assert example["schemaVersion"] == manifest["schemaVersion"]
+    assert example["releaseStatus"] == manifest["releaseStatus"]
+    assert example["packageType"] == manifest["packageType"]
+    assert example["containsCustomExecutable"] == manifest["containsCustomExecutable"]
+    assert example["sdkVersion"] == version
+    assert example.get("packageRevision") == version
+    for package in example["packages"]:
+        assert "path" in package, "source-ready example package must use path"
+        assert "url" not in package, "source-ready example must not require legacy URL packages"
     assert manifest["schemaVersion"] == 1
     assert manifest["sdkVersion"] == version
     assert manifest["packageRevision"] == version
@@ -56,6 +73,7 @@ def verify() -> None:
         safe_zip(archive)
 
     print(f"[ OK ] Source-ready manifest matches OESDK {version}")
+    print("[ OK ] Manifest example matches the current source-ready schema")
     print("[ OK ] Script-only packaging correctly declares no custom executable")
     print("[ OK ] Installed layout and required source payload are present")
     print("[ OK ] Declared build outputs use safe ReleaseAssets paths")

@@ -7,14 +7,15 @@ import hashlib
 import io
 import json
 import pathlib
+import os
 import zipfile
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PACKAGES = ROOT / "Packages"
 ASSETS = ROOT / "ReleaseAssets"
-VERSION = "0.0.11"
-RAW_BASE = "https://raw.githubusercontent.com/ProjectLithos/Lithos/main/Installer/ReleaseAssets"
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+RAW_BASE = os.environ.get("OESDK_RELEASE_ASSET_BASE_URL", "").rstrip("/")
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -70,12 +71,15 @@ def sha256(path: pathlib.Path) -> str:
 
 
 def package_entry(name: str, path: pathlib.Path) -> dict[str, str]:
-    return {
+    entry = {
         "name": name,
-        "url": f"{RAW_BASE}/{path.name}",
+        "path": f"ReleaseAssets/{path.name}",
         "sha256": sha256(path),
         "destination": ".",
     }
+    if RAW_BASE:
+        entry["url"] = f"{RAW_BASE}/{path.name}"
+    return entry
 
 
 def build_source_archive() -> pathlib.Path:
@@ -125,8 +129,7 @@ def build() -> None:
         "qemu": {"ensureScript": "Tools/Ensure-Qemu.ps1"},
     }
     manifest_text = json.dumps(manifest, indent=2) + "\n"
-    (ROOT / "manifest.json").write_text(manifest_text, encoding="utf-8")
-    (ROOT / "manifest.example.json").write_text(manifest_text, encoding="utf-8")
+    (ASSETS / "manifest.release.json").write_text(manifest_text, encoding="utf-8")
     source = build_source_archive()
 
     for path in (core, architecture, qemu, visual_studio, source):
