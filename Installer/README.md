@@ -4,8 +4,6 @@
 
 OESDK provides a reusable low-level foundation while leaving the operating-system architecture, policies, services, userland, and interface under the developer's control.
 
-> Current release: **OESDK 0.0.17.1**
-
 ## Purpose
 
 OESDK is intended for developers building:
