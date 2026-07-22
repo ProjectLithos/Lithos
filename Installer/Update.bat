@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "UpdaterVersion=0.0.17.2"
+set "UpdaterVersion=0.0.17.3"
 set "InstallRoot=C:\OESDK"
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"
@@ -176,7 +176,7 @@ powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
   " if(-not(Test-Path -LiteralPath $requested -PathType Leaf)){throw 'Requested package was not found'};" ^
   " $files=@(Get-Item -LiteralPath $requested)" ^
   "}else{" ^
-  " $files=Get-ChildItem -LiteralPath $env:OESDK_DOWNLOADS -File -Filter 'OESDK-Complete-*.zip' -ErrorAction SilentlyContinue" ^
+  " $files=Get-ChildItem -LiteralPath $env:OESDK_DOWNLOADS -File -Filter '*.zip' -ErrorAction SilentlyContinue|Where-Object {$_.Name -match '^OESDK-(?:Complete-)?[0-9]+(?:\.[0-9]+){2,3}(?:\([0-9]+\))?\.zip$'}" ^
   "};" ^
   "$valid=@();" ^
   "foreach($file in $files){" ^
@@ -208,7 +208,7 @@ powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
   "if(-not $selected){throw 'No complete script-only OESDK package was found'};" ^
   "[IO.File]::WriteAllText($env:OESDK_PACKAGE_FILE,$selected.File.FullName,[Text.Encoding]::ASCII)"
 if errorlevel 1 (
-    call :Fail "No valid complete source ZIP named OESDK-Complete-*.zip was found in Downloads."
+    call :Fail "No valid OESDK-Z.Y.X.zip or OESDK-Complete-Z.Y.X.zip package was found in Downloads."
     goto Cleanup
 )
 

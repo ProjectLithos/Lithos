@@ -1,4 +1,4 @@
-# OESDK 0.0.17.1
+# OESDK 0.17.5
 
 - Added a kernel-owned 256-entry x86-64 IDT.
 - Added assembly entry stubs for architectural exception vectors 0-31.

@@ -1,6 +1,6 @@
 # Kernel-owned GDT and TSS
 
-OESDK 0.0.17.1 replaces the temporary bootstrap descriptor table with a kernel-owned x86-64 Global Descriptor Table.
+OESDK 0.17.5 replaces the temporary bootstrap descriptor table with a kernel-owned x86-64 Global Descriptor Table.
 
 The table retains the existing kernel selectors, adds ring-3 code and data descriptors, and installs a 64-bit Task State Segment. Three dedicated 16 KiB Interrupt Stack Table stacks are reserved for double fault, NMI, and machine check handling.
 

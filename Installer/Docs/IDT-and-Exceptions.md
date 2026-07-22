@@ -1,6 +1,6 @@
 # IDT and Exceptions
 
-OESDK 0.0.17.1 installs a kernel-owned x86-64 Interrupt Descriptor Table after the GDT and TSS are active.
+OESDK 0.17.5 installs a kernel-owned x86-64 Interrupt Descriptor Table after the GDT and TSS are active.
 
 The SDK installs exception vectors 0 through 31. NMI uses IST2, double fault uses IST1, and machine check uses IST3. The remaining exceptions use the current kernel stack. Every exception enters a common assembly frame and is reported through the OESDK panic subsystem.
 
