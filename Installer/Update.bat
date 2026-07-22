@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "UpdaterVersion=0.0.16.3"
+set "UpdaterVersion=0.0.17.0"
 set "InstallRoot=C:\OESDK"
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"

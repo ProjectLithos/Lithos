@@ -12,10 +12,11 @@
 #include <oesdk/panic.h>
 #include <oesdk/cpu.h>
 #include <oesdk/status.h>
+#include <oesdk/gdt.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 0
-#define OESDK_VERSION_PATCH 16
-#define OESDK_VERSION_REVISION 3
+#define OESDK_VERSION_PATCH 17
+#define OESDK_VERSION_REVISION 0
 
 #endif

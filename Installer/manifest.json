@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.16",
+  "sdkVersion": "0.0.17",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.16.3",
+  "packageRevision": "0.0.17.0",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -81,6 +81,7 @@
     "bootContext": "Docs/Boot-Context.md",
     "panicAndAssertions": "Docs/Panic-and-Assertions.md",
     "cpuPrimitives": "Docs/CPU-Primitives.md",
-    "statusContract": "Docs/Status-and-Errors.md"
+    "statusContract": "Docs/Status-and-Errors.md",
+    "gdtAndTss": "Docs/GDT-and-TSS.md"
   }
 }

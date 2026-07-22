@@ -2,6 +2,7 @@
 #include <oesdk/kernel.h>
 #include <oesdk/panic.h>
 #include <oesdk/cpu.h>
+#include <oesdk/gdt.h>
 
 extern void kmain(int argc, char *argv);
 
@@ -9,6 +10,9 @@ __attribute__((noreturn)) void oesdk_runtime_start(uint32_t multiboot_magic, uin
     oesdk_serial_initialize();
     if (!OesdkCpuInitialize()) {
         OesdkPanic("CPU", "x86-64 long mode is unavailable", 0x0000000000000011ULL);
+    }
+    if (!OesdkGdtInitialize()) {
+        OesdkPanic("GDT", "Initialization failed", 0x0000000000000012ULL);
     }
     if (!OesdkBootContextInitialize(multiboot_magic, multiboot_information)) {
         OesdkPanic("BootContext", "Initialization failed", 0x0000000000000010ULL);

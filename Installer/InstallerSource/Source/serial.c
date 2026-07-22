@@ -4,44 +4,58 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-enum { COM1 = 0x3F8 };
-static bool initialized;
+#define COM1 0x3F8U
 
-static inline void out8(uint16_t port, uint8_t value) {
-    __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
+static bool Initialized;
+
+static inline void out8(uint16_t Port, uint8_t Value) {
+    __asm__ volatile ("outb %0, %1" : : "a"(Value), "Nd"(Port));
 }
 
-static inline uint8_t in8(uint16_t port) {
-    uint8_t value;
-    __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
-    return value;
+static inline uint8_t in8(uint16_t Port) {
+    uint8_t Value;
+    __asm__ volatile ("inb %1, %0" : "=a"(Value) : "Nd"(Port));
+    return Value;
 }
 
 void oesdk_serial_initialize(void) {
-    out8(COM1 + 1, 0x00);
-    out8(COM1 + 3, 0x80);
-    out8(COM1 + 0, 0x03);
-    out8(COM1 + 1, 0x00);
-    out8(COM1 + 3, 0x03);
-    out8(COM1 + 2, 0xC7);
-    out8(COM1 + 4, 0x0B);
-    initialized = true;
+    out8(COM1 + 1U, 0x00U);
+    out8(COM1 + 3U, 0x80U);
+    out8(COM1 + 0U, 0x03U);
+    out8(COM1 + 1U, 0x00U);
+    out8(COM1 + 3U, 0x03U);
+    out8(COM1 + 2U, 0xC7U);
+    out8(COM1 + 4U, 0x0BU);
+    Initialized = true;
+}
+
+static void serial_emit(char Character, void *Context) {
+    (void)Context;
+    if (!Initialized) oesdk_serial_initialize();
+    if (Character == '\n') serial_emit('\r', NULL);
+    while ((in8(COM1 + 5U) & 0x20U) == 0U) { }
+    out8(COM1, (uint8_t)Character);
+}
+
+void oesdk_serial_write(const char *Text) {
+    if (Text == NULL) return;
+    while (*Text != '\0') serial_emit(*Text++, NULL);
+}
+
+int oesdk_serial_printf(const char *Format, ...) {
+    va_list Arguments;
+    va_start(Arguments, Format);
+    int Result = oesdk_vformat(serial_emit, NULL, Format, Arguments);
+    va_end(Arguments);
+    return Result;
 }
 
 #ifdef DEBUG
-static void serial_emit(char character, void *context) {
-    (void)context;
-    if (!initialized) oesdk_serial_initialize();
-    if (character == '\n') serial_emit('\r', NULL);
-    while ((in8(COM1 + 5) & 0x20U) == 0) { }
-    out8(COM1, (uint8_t)character);
-}
-
-int oesdk_debug_printf(const char *format, ...) {
-    va_list arguments;
-    va_start(arguments, format);
-    int result = oesdk_vformat(serial_emit, NULL, format, arguments);
-    va_end(arguments);
-    return result;
+int oesdk_debug_printf(const char *Format, ...) {
+    va_list Arguments;
+    va_start(Arguments, Format);
+    int Result = oesdk_vformat(serial_emit, NULL, Format, Arguments);
+    va_end(Arguments);
+    return Result;
 }
 #endif

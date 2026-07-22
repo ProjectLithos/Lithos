@@ -8,7 +8,7 @@ Add-Type -AssemblyName System.Net.Http
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$LibcPayloadName = 'OESDK-LibC-0.0.16.zip'
+$LibcPayloadName = 'OESDK-LibC-0.0.17.zip'
 $LibcPayloadSha256 = 'C7CE8D4E9DDF2AF543C9E5D695977EB91BA1CA2E374D68092E9971EB1F05E61E'
 
 function Add-Control {
@@ -277,8 +277,8 @@ function Select-LibcPayload {
         if (Test-Path -LiteralPath $candidate) { return [IO.Path]::GetFullPath($candidate) }
     }
     $dialog = New-Object Windows.Forms.OpenFileDialog
-    $dialog.Title = 'Select the OESDK 0.0.16 libc payload'
-    $dialog.Filter = 'OESDK libc package|OESDK-LibC-0.0.16.zip|ZIP packages|*.zip'
+    $dialog.Title = 'Select the OESDK 0.0.17 libc payload'
+    $dialog.Filter = 'OESDK libc package|OESDK-LibC-0.0.17.zip|ZIP packages|*.zip'
     $dialog.FileName = $LibcPayloadName
     if ($dialog.ShowDialog() -ne [Windows.Forms.DialogResult]::OK) {
         throw "The required $LibcPayloadName payload was not selected."
@@ -288,12 +288,12 @@ function Select-LibcPayload {
 
 function Install-LibcPayload {
     param([string]$StageRoot, $StatusLabel)
-    $StatusLabel.Text = 'Verifying the OESDK 0.0.16 libc payload...'
+    $StatusLabel.Text = 'Verifying the OESDK 0.0.17 libc payload...'
     [Windows.Forms.Application]::DoEvents()
     $payloadPath = Select-LibcPayload
     $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $payloadPath).Hash
     if ($actual -ne $LibcPayloadSha256) {
-        throw 'The OESDK 0.0.16 libc payload failed its SHA-256 security check.'
+        throw 'The OESDK 0.0.17 libc payload failed its SHA-256 security check.'
     }
     $StatusLabel.Text = 'Adding the full Newlib libc integration...'
     Expand-SafeArchive $payloadPath $StageRoot
@@ -389,21 +389,21 @@ function Install-OESDK {
         Ensure-QemuSupport $manifest $InstallRoot $StatusLabel
         Install-VisualStudioExtension $manifest $InstallRoot $visualStudioPath $StatusLabel
         $ProgressBar.Value = 100
-        $StatusLabel.Text = "OESDK 0.0.16 installed successfully."
+        $StatusLabel.Text = "OESDK 0.0.17 installed successfully."
     } finally {
         if (Test-Path $workRoot) { Remove-Item -LiteralPath $workRoot -Recurse -Force -ErrorAction SilentlyContinue }
     }
 }
 
 $form = New-Object Windows.Forms.Form
-$form.Text = 'OESDK Setup 0.0.16'
+$form.Text = 'OESDK Setup 0.0.17'
 $form.StartPosition = 'CenterScreen'
 $form.ClientSize = New-Object Drawing.Size(660, 430)
 $form.FormBorderStyle = 'FixedDialog'
 $form.MaximizeBox = $false
 $form.Font = New-Object Drawing.Font('Segoe UI', 9)
 
-[void](New-Label $form 'OESDK 0.0.16 Online Installer' 24 20 610 30)
+[void](New-Label $form 'OESDK 0.0.17 Online Installer' 24 20 610 30)
 $form.Controls[$form.Controls.Count - 1].Font = New-Object Drawing.Font('Segoe UI Semibold', 16)
 [void](New-Label $form 'The SDK, Clang components and QEMU are downloaded during installation.' 26 58 610)
 [void](New-Label $form 'Package manifest:' 26 94 130)
@@ -454,14 +454,14 @@ $installButton.Add_Click({
             AuthorName = $authorBox.Text.Trim()
             AuthorEmail = $emailBox.Text.Trim()
             License = $licenseBox.Text.Trim()
-            SdkVersion = '0.0.16'
+            SdkVersion = '0.0.17'
         }
         $defaults | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'OESDKProjectDefaults.json') -Encoding UTF8
         [Windows.Forms.MessageBox]::Show($form, 'OESDK was installed successfully.', 'OESDK Setup', 'OK', 'Information') | Out-Null
     } catch {
         $status.Text = 'Installation failed.'
         $logPath = Join-Path $env:TEMP 'OESDK-Setup.log'
-        $details = "OESDK Setup 0.0.16`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
+        $details = "OESDK Setup 0.0.17`r`n$([DateTime]::Now.ToString('O'))`r`n$($_ | Out-String)"
         [IO.File]::WriteAllText($logPath, $details)
         $message = "$($_.Exception.Message)`r`n`r`nDiagnostic log: $logPath"
         [Windows.Forms.MessageBox]::Show($form, $message, 'OESDK Setup', 'OK', 'Error') | Out-Null

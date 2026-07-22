@@ -1,4 +1,4 @@
-# OESDK Installer Source 0.0.16.3
+# OESDK Installer Source 0.0.17.0
 
 This update adds a complete Newlib-based libc and libm integration for OESDK.
 

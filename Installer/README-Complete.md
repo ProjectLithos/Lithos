@@ -1,4 +1,4 @@
-# OESDK Complete 0.0.16.3
+# OESDK Complete 0.0.17.0
 
 This is a script-only complete SDK package.
 
