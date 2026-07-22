@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.14",
+  "sdkVersion": "0.17.15",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.14",
+  "packageRevision": "0.17.15",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -88,7 +88,7 @@
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md"
   },
-  "visualStudioSdkVersion": "0.17.14",
+  "visualStudioSdkVersion": "0.17.15",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -149,5 +149,8 @@
     "multiboot1Conversion": true,
     "sorting": true,
     "adjacentRegionCoalescing": true
+  },
+  "templateSafety": {
+    "integerFormattingExamples": true
   }
 }

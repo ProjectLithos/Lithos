@@ -102,6 +102,11 @@ void kmain(int argc, char *argv)
     (void)argc;
     (void)argv;
 
+    const OesdkBootContext *bootContext = OesdkBootContextGet();
+    if (bootContext != NULL) {
+        kprintf("ABI Version: %u\n", (unsigned int)bootContext->AbiVersion);
+    }
+
     kdebugf("__PROJECT_NAME__: Hello from the serial debug port!\n");
     kprintf("__PROJECT_NAME__: Hello Screen!\n");
 }
@@ -112,7 +117,7 @@ $source = $source.Replace('__PROJECT_NAME__', $ProjectName)
 $readme = @"
 # $ProjectName
 
-This is an OESDK 0.0.11 native Clang C $ProjectType project. It is a `.vcxproj`,
+This is an OESDK 0.17.15 native Clang C $ProjectType project. It is a `.vcxproj`,
 not a C# `.csproj`, and does not require the Microsoft .NET SDK.
 
 Build Debug or Release in Visual Studio, then use Start Without Debugging to
