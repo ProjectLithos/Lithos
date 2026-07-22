@@ -1,4 +1,4 @@
-# OESDK Boot Context 0.0.16.0
+# OESDK Boot Context 0.0.16.1
 
 `OesdkBootContextInitialize` validates the Multiboot 1 handoff before `kmain` runs. `OesdkBootContextGet` returns the immutable context.
 

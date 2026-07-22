@@ -9,10 +9,11 @@
 #include <oesdk/debug.h>
 #include <oesdk/graphics.h>
 #include <oesdk/boot_context.h>
+#include <oesdk/panic.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 0
 #define OESDK_VERSION_PATCH 16
-#define OESDK_VERSION_REVISION 0
+#define OESDK_VERSION_REVISION 1
 
 #endif
