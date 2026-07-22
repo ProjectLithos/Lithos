@@ -2,9 +2,7 @@ OESDK starter runtime
 
 Copyright (c) 2026 Project Lithos contributors.
 
-Permission is granted to use, copy, modify, but not to distribute this software for
-any purpose with or without fee. This license must be retained in all distributions, uses, copies and modifications.
-
-Any modifications of this software must be provided back to us so that we can detcide whether we will include it in our next release.
+Permission is granted to use, copy, modify, and distribute this software for
+any purpose with or without fee, provided that this notice is retained.
 
 THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
