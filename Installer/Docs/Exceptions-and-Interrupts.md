@@ -1,6 +1,6 @@
 # Exceptions and Interrupts
 
-OESDK 0.17.7 installs a kernel-owned x86-64 IDT with all 256 vectors. Architectural exceptions 0-31 use correctly shaped stubs, including CPU-supplied error codes.
+OESDK 0.17.8 installs a kernel-owned x86-64 IDT with all 256 vectors. Architectural exceptions 0-31 use correctly shaped stubs, including CPU-supplied error codes.
 
 ## Safety foundation
 

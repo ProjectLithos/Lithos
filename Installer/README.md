@@ -1,4 +1,4 @@
-# OESDK 0.17.7
+# OESDK 0.17.8
 
 OESDK is a freestanding x86-64 operating-system development kit with Visual Studio, QEMU, GDB, bootstrap, runtime, console, graphics, Boot Context, panic, CPU, status, GDT/TSS, and IDT/exception support.
 
@@ -31,6 +31,6 @@ OESDK projects produce a symbol-rich `Build/Debug/kernel.elf`. Press F5 in a con
 
 ## Version
 
-- SDK package: `0.17.7`
+- SDK package: `0.17.8`
 - API documentation contract introduced in this refreshed package
 - The updater keeps its own independent file version and is not versioned from the SDK package number
