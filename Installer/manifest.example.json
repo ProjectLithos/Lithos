@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.12",
+  "sdkVersion": "0.17.13",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.12",
+  "packageRevision": "0.17.13",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -87,7 +87,7 @@
     "apiReference": "Docs/API/README.md",
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py"
   },
-  "visualStudioSdkVersion": "0.17.12",
+  "visualStudioSdkVersion": "0.17.13",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,

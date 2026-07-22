@@ -14,6 +14,15 @@ extern "C" {
 #define OESDK_INTERRUPT_VECTOR_FIRST 32U
 #define OESDK_INTERRUPT_VECTOR_LAST 255U
 
+#define OESDK_PAGE_FAULT_PRESENT_BIT          (UINT64_C(1) << 0U)
+#define OESDK_PAGE_FAULT_WRITE_BIT            (UINT64_C(1) << 1U)
+#define OESDK_PAGE_FAULT_USER_BIT             (UINT64_C(1) << 2U)
+#define OESDK_PAGE_FAULT_RESERVED_BIT         (UINT64_C(1) << 3U)
+#define OESDK_PAGE_FAULT_INSTRUCTION_BIT      (UINT64_C(1) << 4U)
+#define OESDK_PAGE_FAULT_PROTECTION_KEY_BIT   (UINT64_C(1) << 5U)
+#define OESDK_PAGE_FAULT_SHADOW_STACK_BIT     (UINT64_C(1) << 6U)
+#define OESDK_PAGE_FAULT_SGX_BIT              (UINT64_C(1) << 15U)
+
 typedef struct OesdkInterruptFrame {
     uint64_t R15;
     uint64_t R14;
@@ -68,6 +77,7 @@ OesdkStatus OesdkInterruptHandlerRegister(uint8_t Vector, OesdkInterruptHandler 
 OesdkStatus OesdkInterruptHandlerUnregister(uint8_t Vector, OesdkInterruptHandler Handler);
 bool OesdkInterruptHandlerIsRegistered(uint8_t Vector);
 OesdkPageFaultInformation OesdkPageFaultDecode(uintptr_t Address, uint64_t ErrorCode);
+OesdkPageFaultInformation OesdkPageFaultDecodeCurrent(uint64_t ErrorCode);
 void OesdkInterruptFrameDump(const OesdkInterruptFrame *Frame);
 
 void OesdkDivideErrorHandler(OesdkInterruptFrame *Frame);

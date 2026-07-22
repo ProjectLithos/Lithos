@@ -125,3 +125,21 @@ When a public API function, function-like macro, or type is added to `Include/oe
 2. add the page to this index;
 3. mirror it into the installer documentation tree;
 4. pass `Tests/VerifyApiDocumentation.py`.
+
+- [OesdkPageFaultDecodeCurrent](OesdkPageFaultDecodeCurrent.md)
+
+- [OESDK_PAGE_FAULT_PRESENT_BIT](OESDK_PAGE_FAULT_PRESENT_BIT.md)
+
+- [OESDK_PAGE_FAULT_WRITE_BIT](OESDK_PAGE_FAULT_WRITE_BIT.md)
+
+- [OESDK_PAGE_FAULT_USER_BIT](OESDK_PAGE_FAULT_USER_BIT.md)
+
+- [OESDK_PAGE_FAULT_RESERVED_BIT](OESDK_PAGE_FAULT_RESERVED_BIT.md)
+
+- [OESDK_PAGE_FAULT_INSTRUCTION_BIT](OESDK_PAGE_FAULT_INSTRUCTION_BIT.md)
+
+- [OESDK_PAGE_FAULT_PROTECTION_KEY_BIT](OESDK_PAGE_FAULT_PROTECTION_KEY_BIT.md)
+
+- [OESDK_PAGE_FAULT_SHADOW_STACK_BIT](OESDK_PAGE_FAULT_SHADOW_STACK_BIT.md)
+
+- [OESDK_PAGE_FAULT_SGX_BIT](OESDK_PAGE_FAULT_SGX_BIT.md)

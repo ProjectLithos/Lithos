@@ -81,15 +81,19 @@ OesdkPageFaultInformation OesdkPageFaultDecode(uintptr_t Address, uint64_t Error
     OesdkPageFaultInformation Information;
     Information.Address = Address;
     Information.ErrorCode = ErrorCode;
-    Information.PresentViolation = (ErrorCode & (UINT64_C(1) << 0U)) != 0U;
-    Information.WriteAccess = (ErrorCode & (UINT64_C(1) << 1U)) != 0U;
-    Information.UserAccess = (ErrorCode & (UINT64_C(1) << 2U)) != 0U;
-    Information.ReservedBitViolation = (ErrorCode & (UINT64_C(1) << 3U)) != 0U;
-    Information.InstructionFetch = (ErrorCode & (UINT64_C(1) << 4U)) != 0U;
-    Information.ProtectionKeyViolation = (ErrorCode & (UINT64_C(1) << 5U)) != 0U;
-    Information.ShadowStackAccess = (ErrorCode & (UINT64_C(1) << 6U)) != 0U;
-    Information.SgxViolation = (ErrorCode & (UINT64_C(1) << 15U)) != 0U;
+    Information.PresentViolation = (ErrorCode & OESDK_PAGE_FAULT_PRESENT_BIT) != 0U;
+    Information.WriteAccess = (ErrorCode & OESDK_PAGE_FAULT_WRITE_BIT) != 0U;
+    Information.UserAccess = (ErrorCode & OESDK_PAGE_FAULT_USER_BIT) != 0U;
+    Information.ReservedBitViolation = (ErrorCode & OESDK_PAGE_FAULT_RESERVED_BIT) != 0U;
+    Information.InstructionFetch = (ErrorCode & OESDK_PAGE_FAULT_INSTRUCTION_BIT) != 0U;
+    Information.ProtectionKeyViolation = (ErrorCode & OESDK_PAGE_FAULT_PROTECTION_KEY_BIT) != 0U;
+    Information.ShadowStackAccess = (ErrorCode & OESDK_PAGE_FAULT_SHADOW_STACK_BIT) != 0U;
+    Information.SgxViolation = (ErrorCode & OESDK_PAGE_FAULT_SGX_BIT) != 0U;
     return Information;
+}
+
+OesdkPageFaultInformation OesdkPageFaultDecodeCurrent(uint64_t ErrorCode) {
+    return OesdkPageFaultDecode(OesdkCpuReadCr2(), ErrorCode);
 }
 
 void OesdkInterruptFrameDump(const OesdkInterruptFrame *Frame) {
@@ -139,7 +143,7 @@ void OesdkPageFaultHandler(OesdkInterruptFrame *Frame) {
     if (Frame == NULL) {
         OesdkPanic("Exception", "Missing page-fault frame", OESDK_EXCEPTION_PANIC_BASE | UINT64_C(14));
     }
-    OesdkPageFaultInformation Fault = OesdkPageFaultDecode(OesdkCpuReadCr2(), Frame->ErrorCode);
+    OesdkPageFaultInformation Fault = OesdkPageFaultDecodeCurrent(Frame->ErrorCode);
     oesdk_serial_printf("\n[FAIL] CPU exception 14: Page Fault\n");
     oesdk_serial_printf("[FAIL] Page fault address: 0x%016llX\n", (uint64_t)Fault.Address);
     oesdk_serial_printf("[FAIL] Cause: %s, %s, %s%s%s%s%s%s\n",
