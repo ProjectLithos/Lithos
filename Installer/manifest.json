@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.0.13",
+  "sdkVersion": "0.0.16",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -18,19 +18,19 @@
   "packages": [
     {
       "name": "OESDK LibC Source",
-      "path": "ReleaseAssets/OESDK-LibC-0.0.13-Source.zip"
+      "path": "ReleaseAssets/OESDK-LibC-0.0.16-Source.zip"
     },
     {
       "name": "OESDK LibC Integration",
-      "path": "ReleaseAssets/OESDK-LibC-0.0.13.zip"
+      "path": "ReleaseAssets/OESDK-LibC-0.0.16.zip"
     },
     {
       "name": "OESDK LibC Symbols",
-      "path": "ReleaseAssets/OESDK-LibC-Symbols-0.0.13.zip",
+      "path": "ReleaseAssets/OESDK-LibC-Symbols-0.0.16.zip",
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.13.20",
+  "packageRevision": "0.0.16.0",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -77,6 +77,7 @@
     "repairTool": "Tools/Repair-Project-DebugLaunchers.ps1"
   },
   "documentation": {
-    "gdbCommandReference": "Docs/GDB-Command-Reference.md"
+    "gdbCommandReference": "Docs/GDB-Command-Reference.md",
+    "bootContext": "Docs/Boot-Context.md"
   }
 }

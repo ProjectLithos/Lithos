@@ -5,6 +5,10 @@ extern void kmain(int argc, char *argv);
 
 __attribute__((noreturn)) void oesdk_runtime_start(uint32_t multiboot_magic, uintptr_t multiboot_information) {
     oesdk_serial_initialize();
+    if (!OesdkBootContextInitialize(multiboot_magic, multiboot_information)) {
+        kdebugf("[FAIL] OESDK Boot Context initialization failed.\n");
+        for (;;) __asm__ volatile ("cli; hlt");
+    }
     oesdk_console_initialize();
     oesdk_graphics_initialize(multiboot_magic, multiboot_information);
     kmain(0, NULL);

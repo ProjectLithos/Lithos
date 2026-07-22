@@ -1,6 +1,6 @@
-# OESDK 0.0.13 full libc
+# OESDK 0.0.16 full libc
 
-OESDK 0.0.13 integrates Newlib 4.6.0.20260123 as its full C library.
+OESDK 0.0.16 integrates Newlib 4.6.0.20260123 as its full C library.
 
 Newlib supplies the standard C library and mathematical library. OESDK supplies
 the operating-system boundary through `OesdkLibcHost`. Install the host table

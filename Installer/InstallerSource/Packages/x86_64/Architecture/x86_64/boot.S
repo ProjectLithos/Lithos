@@ -121,8 +121,12 @@ page_directories:
     .skip 16384
 
 .balign 16
+.global __bootstrap_stack_bottom
+.global __bootstrap_stack_top
+__bootstrap_stack_bottom:
 stack_bottom:
     .skip 65536
+__bootstrap_stack_top:
 stack_top:
 
 .section .note.GNU-stack,"",@progbits

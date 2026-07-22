@@ -9,7 +9,7 @@ New-Item -ItemType Directory -Force -Path $Destination | Out-Null
 Copy-Item -Recurse -Force "$Root\Packages\LibC" "$Destination\LibC"
 Copy-Item -Recurse -Force "$Root\Tools" "$Destination\Tools"
 Copy-Item -Force "$Root\VERSION" "$Destination\VERSION"
-Write-Host "[ OK ] Installed OESDK 0.0.13 libc integration to $Destination."
+Write-Host "[ OK ] Installed OESDK 0.0.16 libc integration to $Destination."
 
 if ($BuildLibC) {
     & "$Destination\Tools\BuildNewlib.ps1" -Distribution $WslDistribution

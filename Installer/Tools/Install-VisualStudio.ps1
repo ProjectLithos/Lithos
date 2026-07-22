@@ -179,7 +179,7 @@ try {
                 AuthorName = ''
                 AuthorEmail = ''
                 License = 'MIT'
-                SdkVersion = '0.0.13'
+                SdkVersion = '0.0.16'
             } | ConvertTo-Json | Set-Content -LiteralPath $defaultsPath -Encoding UTF8
         }
     } catch {
