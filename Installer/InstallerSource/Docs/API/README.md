@@ -46,10 +46,15 @@ Every public function, function-like macro, and public SDK type has its own Mark
 
 ## GDT and TSS
 
+- [`OesdkGdtDescriptorKind`](./OesdkGdtDescriptorKind.md) — type
+- [`OESDK_GDT_USER_DATA_RPL3_SELECTOR`](./OESDK_GDT_USER_DATA_RPL3_SELECTOR.md) — macro
+- [`OESDK_GDT_USER_CODE_RPL3_SELECTOR`](./OESDK_GDT_USER_CODE_RPL3_SELECTOR.md) — macro
 - [`OesdkGdtInformation`](./OesdkGdtInformation.md) — type
 - [`OesdkGdtInitialize`](./OesdkGdtInitialize.md) — function
+- [`OesdkGdtIsInitialized`](./OesdkGdtIsInitialized.md) — function
 - [`OesdkGdtInformationGet`](./OesdkGdtInformationGet.md) — function
 - [`OesdkGdtSetKernelStack`](./OesdkGdtSetKernelStack.md) — function
+- [`OesdkGdtSetInterruptStack`](./OesdkGdtSetInterruptStack.md) — function
 
 ## Graphics
 

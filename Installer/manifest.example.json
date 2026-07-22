@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.10",
+  "sdkVersion": "0.17.11",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.10",
+  "packageRevision": "0.17.11",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -87,7 +87,7 @@
     "apiReference": "Docs/API/README.md",
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py"
   },
-  "visualStudioSdkVersion": "0.17.10",
+  "visualStudioSdkVersion": "0.17.11",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -100,5 +100,25 @@
     "pageFaultDecode": true,
     "registerDump": true,
     "handlerRegistration": true
+  },
+  "gdtAndTss": {
+    "architecture": "x86_64",
+    "ownedGdt": true,
+    "selectors": {
+      "null": "0x00",
+      "kernelCode": "0x08",
+      "kernelData": "0x10",
+      "userData": "0x18",
+      "userCode": "0x20",
+      "tss": "0x28"
+    },
+    "tssBytes": 104,
+    "istEntries": 7,
+    "istStackBytes": 16384,
+    "dedicatedIst": [
+      "double-fault",
+      "nmi",
+      "machine-check"
+    ]
   }
 }

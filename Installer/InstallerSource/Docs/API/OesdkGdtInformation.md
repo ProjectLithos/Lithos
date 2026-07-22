@@ -1,25 +1,28 @@
 # `OesdkGdtInformation`
 
-**Category:** GDT and TSS  
-**Kind:** type  
-**Header:** `<oesdk/gdt.h>`
+## Header
 
-Describes the active GDT, TSS selector, ring-0 stack, and interrupt stacks.
+```c
+#include <oesdk/gdt.h>
+```
 
 ## Declaration
 
 ```c
-typedef struct OesdkGdtInformation
+typedef struct OesdkGdtInformation {
+    uint16_t Limit;
+    uintptr_t Base;
+    uint16_t TaskStateSelector;
+    uintptr_t Ring0Stack;
+    uintptr_t InterruptStackTable[7];
+    uint8_t DescriptorCount;
+    bool TaskRegisterLoaded;
+    bool Initialized;
+} OesdkGdtInformation;
 ```
 
-## Returns
+## Description
 
-A read-only structure returned by `OesdkGdtInformationGet`.
+Read-only diagnostic state for the active OESDK-owned GDT and TSS. It reports the GDTR image, TSS selector, current `RSP0`, all seven IST stack tops, descriptor count, task-register state, and initialization state.
 
-## Example
-
-```c
-const OesdkGdtInformation *gdt = OesdkGdtInformationGet();
-```
-
-[Back to the API index](./README.md)
+Obtain it with `OesdkGdtInformationGet()`.
