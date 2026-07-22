@@ -1,4 +1,4 @@
-# OESDK 0.17.15
+# OESDK 0.17.16
 
 - Fixed generated kernel examples to print `OesdkBootContext.AbiVersion` with `%u`.
 - Removed the invalid string-plus-integer pattern that performs pointer arithmetic.
