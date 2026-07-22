@@ -125,10 +125,16 @@ foreach ($source in $sources) {
     $objects.Add($object)
 }
 
-$bootObject = Join-Path $objectRoot 'boot.o'
-Write-Host "Clang ASM $bootSource"
-& $clang @common -c $bootSource -o $bootObject
-if ($LASTEXITCODE -ne 0) { throw 'Clang failed for the x86-64 boot source.' }
+$architectureSourceRoot = Join-Path $sdkRoot 'Architecture\x86_64'
+$assemblySources = @(Get-ChildItem -LiteralPath $architectureSourceRoot -Filter '*.S' -File | Sort-Object Name)
+$assemblyObjects = New-Object System.Collections.Generic.List[string]
+foreach ($assemblySource in $assemblySources) {
+    $assemblyObject = Join-Path $objectRoot ("Architecture-{0}.o" -f $assemblySource.BaseName)
+    Write-Host "Clang ASM $($assemblySource.FullName)"
+    & $clang @common -c $assemblySource.FullName -o $assemblyObject
+    if ($LASTEXITCODE -ne 0) { throw "Clang failed for $($assemblySource.FullName)." }
+    $assemblyObjects.Add($assemblyObject)
+}
 
 $sdkSourceCount = $sdkSources.Count
 $library = Join-Path $outputRoot 'liboesdk.a'
@@ -139,7 +145,7 @@ if ($LASTEXITCODE -ne 0) { throw 'llvm-ar failed while creating liboesdk.a.' }
 $projectObjects = @($objects | Select-Object -Skip $sdkSourceCount)
 $kernel = Join-Path $outputRoot 'kernel.elf'
 Write-Host "LLD       $kernel"
-& $linker -T $linkerScript --build-id=none -z max-page-size=0x1000 -o $kernel $bootObject @projectObjects $library
+& $linker -T $linkerScript --build-id=none -z max-page-size=0x1000 -o $kernel @assemblyObjects @projectObjects $library
 if ($LASTEXITCODE -ne 0) { throw 'LLD failed while linking the kernel.' }
 
 Write-Host "Built $kernel"

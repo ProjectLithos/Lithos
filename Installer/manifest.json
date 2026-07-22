@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.0.17.0",
+  "packageRevision": "0.0.17.1",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -82,6 +82,7 @@
     "panicAndAssertions": "Docs/Panic-and-Assertions.md",
     "cpuPrimitives": "Docs/CPU-Primitives.md",
     "statusContract": "Docs/Status-and-Errors.md",
-    "gdtAndTss": "Docs/GDT-and-TSS.md"
+    "gdtAndTss": "Docs/GDT-and-TSS.md",
+    "idtAndExceptions": "Docs/IDT-and-Exceptions.md"
   }
 }
