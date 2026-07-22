@@ -15,6 +15,8 @@ OESDK is a freestanding x86-64 operating-system development kit with Visual Stud
 
 Every public API function, function-like macro, and public SDK type has its own Markdown page under `Docs/API`. `Tests/VerifyApiDocumentation.py` checks that new public APIs cannot be packaged without documentation and an index link.
 
+All project documentation is kept in the single root `Docs` folder.
+
 ## Public umbrella header
 
 ```c

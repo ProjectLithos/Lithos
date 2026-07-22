@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "UpdaterVersion=0.0.17.0"
+set "UpdaterVersion=0.0.17.2"
 set "InstallRoot=C:\OESDK"
 set "Repository=ProjectLithos/Lithos"
 set "Branch=main"
@@ -155,6 +155,9 @@ set "Checkout=%WorkRoot%\Checkout"
 set "PackageFile=%WorkRoot%\Package.txt"
 set "RootFile=%WorkRoot%\Root.txt"
 set "VersionFile=%WorkRoot%\Version.txt"
+set "VisualStudioVersionFile=%WorkRoot%\VisualStudioVersion.txt"
+set "InstalledVisualStudioVersionFile=%WorkRoot%\InstalledVisualStudioVersion.txt"
+set "InstallVisualStudioFile=%WorkRoot%\InstallVisualStudio.txt"
 mkdir "%ExtractRoot%" >nul 2>nul
 if errorlevel 1 (
     call :Fail "Unable to create updater workspace."
@@ -197,11 +200,11 @@ powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
   "    $versionEntry=$zip.Entries|Where-Object {$_.FullName -match '(^|/)VERSION$'}|Select-Object -First 1;" ^
   "    if($versionEntry){$reader=New-Object IO.StreamReader($versionEntry.Open());try{$version=[version]($reader.ReadToEnd().Trim())}finally{$reader.Dispose()}}" ^
   "   };" ^
-  "   if($version){$valid += [pscustomobject]@{File=$file;Version=$version}}" ^
+  "   if($version){$valid += [pscustomobject]@{File=$file;Version=$version;LastWriteTimeUtc=$file.LastWriteTimeUtc}}" ^
   "  }" ^
   " }catch{}finally{if($zip){$zip.Dispose()}}" ^
   "};" ^
-  "$selected=$valid|Sort-Object Version -Descending|Select-Object -First 1;" ^
+  "$selected=$valid|Sort-Object @{Expression='Version';Descending=$true},@{Expression='LastWriteTimeUtc';Descending=$true}|Select-Object -First 1;" ^
   "if(-not $selected){throw 'No complete script-only OESDK package was found'};" ^
   "[IO.File]::WriteAllText($env:OESDK_PACKAGE_FILE,$selected.File.FullName,[Text.Encoding]::ASCII)"
 if errorlevel 1 (
@@ -263,6 +266,40 @@ powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
   "$exe=Get-ChildItem -LiteralPath $root -File -Filter '*.exe' -Recurse -ErrorAction SilentlyContinue|Select-Object -First 1;" ^
   "if($exe){throw ('Custom executable is not permitted in this package: '+$exe.FullName)};" ^
   "[IO.File]::WriteAllText($env:OESDK_VERSION_FILE,$version,[Text.Encoding]::ASCII)"
+
+set "OESDK_VISUAL_STUDIO_VERSION_FILE=%VisualStudioVersionFile%"
+set "OESDK_INSTALLED_VISUAL_STUDIO_VERSION_FILE=%InstalledVisualStudioVersionFile%"
+set "OESDK_INSTALL_VISUAL_STUDIO_FILE=%InstallVisualStudioFile%"
+set "OESDK_INSTALL_ROOT=%InstallRoot%"
+set "OESDK_LOCAL_APPDATA=%LOCALAPPDATA%"
+powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
+  "$ErrorActionPreference='Stop';$root=$env:OESDK_PACKAGE_ROOT;" ^
+  "$source=$null;" ^
+  "$sourceFile=Join-Path $root 'VisualStudio\VERSION';" ^
+  "if(Test-Path -LiteralPath $sourceFile -PathType Leaf){$source=[version]((Get-Content -Raw -LiteralPath $sourceFile).Trim())};" ^
+  "if(-not $source){$manifest=Join-Path $root 'manifest.json';if(Test-Path -LiteralPath $manifest){$m=Get-Content -Raw -LiteralPath $manifest|ConvertFrom-Json;if($m.visualStudioSdkVersion){$source=[version][string]$m.visualStudioSdkVersion}}};" ^
+  "if(-not $source){$sdkVersionFile=$env:OESDK_VERSION_FILE;if(Test-Path -LiteralPath $sdkVersionFile -PathType Leaf){try{$source=[version]((Get-Content -Raw -LiteralPath $sdkVersionFile).Trim())}catch{}}};" ^
+  "if(-not $source){$rootVersion=Join-Path $root 'VERSION';if(Test-Path -LiteralPath $rootVersion -PathType Leaf){try{$source=[version]((Get-Content -Raw -LiteralPath $rootVersion).Trim())}catch{}}};" ^
+  "if(-not $source){throw 'The Visual Studio SDK version and SDK fallback version are missing'};" ^
+  "$installed=[version]'0.0.0.0';" ^
+  "$marker=Join-Path $env:OESDK_LOCAL_APPDATA 'OESDK\VisualStudioSdk.version';" ^
+  "if(Test-Path -LiteralPath $marker -PathType Leaf){try{$installed=[version]((Get-Content -Raw -LiteralPath $marker).Trim())}catch{}};" ^
+  "if($installed -eq [version]'0.0.0.0' -and (Test-Path -LiteralPath $env:OESDK_INSTALL_ROOT -PathType Container)){" ^
+  " $legacyFile=Join-Path $env:OESDK_INSTALL_ROOT 'VisualStudio\VERSION';" ^
+  " if(Test-Path -LiteralPath $legacyFile -PathType Leaf){try{$installed=[version]((Get-Content -Raw -LiteralPath $legacyFile).Trim())}catch{}};" ^
+  " if($installed -eq [version]'0.0.0.0'){$legacyVersion=Join-Path $env:OESDK_INSTALL_ROOT 'VERSION';if(Test-Path -LiteralPath $legacyVersion -PathType Leaf){try{$installed=[version]((Get-Content -Raw -LiteralPath $legacyVersion).Trim())}catch{}}}" ^
+  "};" ^
+  "$install=if($source -gt $installed){'1'}else{'0'};" ^
+  "[IO.File]::WriteAllText($env:OESDK_VISUAL_STUDIO_VERSION_FILE,$source.ToString(),[Text.Encoding]::ASCII);" ^
+  "[IO.File]::WriteAllText($env:OESDK_INSTALLED_VISUAL_STUDIO_VERSION_FILE,$installed.ToString(),[Text.Encoding]::ASCII);" ^
+  "[IO.File]::WriteAllText($env:OESDK_INSTALL_VISUAL_STUDIO_FILE,$install,[Text.Encoding]::ASCII)"
+if errorlevel 1 (
+    call :Fail "Unable to compare Visual Studio SDK versions."
+    goto Cleanup
+)
+set /P "VisualStudioVersion="<"%VisualStudioVersionFile%"
+set /P "InstalledVisualStudioVersion="<"%InstalledVisualStudioVersionFile%"
+set /P "InstallVisualStudio="<"%InstallVisualStudioFile%"
 if errorlevel 1 (
     call :Fail "The complete package failed validation."
     goto Cleanup
@@ -390,14 +427,30 @@ if errorlevel 1 (
     call :Ok "GitHub already contains this exact SDK tree."
 )
 
-call :Ok "Starting local Visual Studio setup."
+if not "%InstallVisualStudio%"=="1" goto SkipVisualStudioSetup
+call :Ok "Installing newer Visual Studio SDK %VisualStudioVersion% over %InstalledVisualStudioVersion%."
 call "%InstallRoot%\Setup.bat"
-set "SetupExit=%errorlevel%"
-if not "%SetupExit%"=="0" (
-    call :Fail "Visual Studio setup exited with code %SetupExit%."
+if errorlevel 1 (
+    call :Fail "Visual Studio setup failed."
     goto Cleanup
 )
-call :Ok "Visual Studio SDK setup completed."
+set "OESDK_VISUAL_STUDIO_MARKER=%LOCALAPPDATA%\OESDK\VisualStudioSdk.version"
+set "OESDK_VISUAL_STUDIO_MARKER_VERSION=%VisualStudioVersion%"
+powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
+  "$ErrorActionPreference='Stop';$marker=$env:OESDK_VISUAL_STUDIO_MARKER;$directory=Split-Path -Parent $marker;" ^
+  "if(-not(Test-Path -LiteralPath $directory -PathType Container)){New-Item -ItemType Directory -Path $directory -Force|Out-Null};" ^
+  "[IO.File]::WriteAllText($marker,$env:OESDK_VISUAL_STUDIO_MARKER_VERSION,[Text.Encoding]::ASCII)"
+if errorlevel 1 (
+    call :Fail "Visual Studio setup succeeded, but its installed-version marker could not be written."
+    goto Cleanup
+)
+call :Ok "Visual Studio SDK %VisualStudioVersion% setup completed and recorded."
+goto VisualStudioSetupDone
+
+:SkipVisualStudioSetup
+call :Ok "Visual Studio SDK %InstalledVisualStudioVersion% is already current; setup skipped."
+
+:VisualStudioSetupDone
 set "ExitCode=0"
 goto Cleanup
 

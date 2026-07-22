@@ -186,6 +186,15 @@ try {
         $warnings.Add("Visual Studio components were installed, but project defaults could not be written: $($_.Exception.Message)")
     }
 
+    $visualStudioVersionFile = Join-Path $root 'VisualStudio\VERSION'
+    if (-not (Test-Path -LiteralPath $visualStudioVersionFile -PathType Leaf)) {
+        throw 'The OESDK Visual Studio SDK version file is missing.'
+    }
+    $visualStudioVersion = [version]((Get-Content -Raw -LiteralPath $visualStudioVersionFile).Trim())
+    $markerDirectory = Join-Path $env:LOCALAPPDATA 'OESDK'
+    New-Item -ItemType Directory -Force -Path $markerDirectory | Out-Null
+    Set-Content -LiteralPath (Join-Path $markerDirectory 'VisualStudioSdk.version') -Value $visualStudioVersion.ToString() -Encoding ASCII
+
     if ($warnings.Count -gt 0) {
         $message = "OESDK Visual Studio components were installed successfully.`r`n`r`n" + ($warnings -join "`r`n")
         Show-Result $message 'Warning'

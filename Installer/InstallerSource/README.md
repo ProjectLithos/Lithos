@@ -4,16 +4,16 @@ OESDK is a freestanding x86-64 operating-system development kit with Visual Stud
 
 ## API documentation
 
-- [Complete API reference](Documentation/API/README.md)
-- [Boot Context overview](Documentation/Boot-Context.md)
-- [Panic and assertions overview](Documentation/Panic-and-Assertions.md)
-- [CPU primitives overview](Documentation/CPU-Primitives.md)
-- [Status and errors overview](Documentation/Status-and-Errors.md)
-- [GDT and TSS overview](Documentation/GDT-and-TSS.md)
-- [IDT and exceptions overview](Documentation/IDT-and-Exceptions.md)
-- [GDB command reference](Documentation/GDB-Command-Reference.md)
+- [Complete API reference](../Docs/API/README.md)
+- [Boot Context overview](../Docs/Boot-Context.md)
+- [Panic and assertions overview](../Docs/Panic-and-Assertions.md)
+- [CPU primitives overview](../Docs/CPU-Primitives.md)
+- [Status and errors overview](../Docs/Status-and-Errors.md)
+- [GDT and TSS overview](../Docs/GDT-and-TSS.md)
+- [IDT and exceptions overview](../Docs/IDT-and-Exceptions.md)
+- [GDB command reference](../Docs/GDB-Command-Reference.md)
 
-Every public API function, function-like macro, and public SDK type has its own Markdown page under `Documentation/API`. `Tests/VerifyApiDocumentation.py` checks that new public APIs cannot be packaged without documentation and an index link.
+Every public API function, function-like macro, and public SDK type has its own Markdown page under the single root `Docs/API` folder. `Tests/VerifyApiDocumentation.py` checks that new public APIs cannot be packaged without documentation and an index link.
 
 ## Public umbrella header
 

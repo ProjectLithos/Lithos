@@ -4,7 +4,12 @@ from pathlib import Path
 import re
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = Path(__file__).resolve()
+ROOT = next(
+    (candidate for candidate in [SCRIPT.parents[1], *SCRIPT.parents[2:]]
+     if (candidate / "Include" / "oesdk").is_dir() and (candidate / "Docs" / "API").is_dir()),
+    SCRIPT.parents[1],
+)
 HEADERS = ROOT / "Include" / "oesdk"
 API_DIR = ROOT / "Docs" / "API"
 INDEX = API_DIR / "README.md"

@@ -86,5 +86,6 @@
     "idtAndExceptions": "Docs/IDT-and-Exceptions.md",
     "apiReference": "Docs/API/README.md",
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py"
-  }
+  },
+  "visualStudioSdkVersion": "0.0.17.1"
 }
