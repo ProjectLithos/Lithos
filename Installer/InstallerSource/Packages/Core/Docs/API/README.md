@@ -233,3 +233,12 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [OesdkHeapBootstrapIsInitialized](OesdkHeapBootstrapIsInitialized.md)
 
 - [OesdkHeapInformationGet](OesdkHeapInformationGet.md)
+
+- [OesdkHeapInitialize](OesdkHeapInitialize.md)
+- [OesdkAllocate](OesdkAllocate.md)
+- [OesdkAllocateAligned](OesdkAllocateAligned.md)
+- [OesdkAllocateZeroed](OesdkAllocateZeroed.md)
+- [OesdkFree](OesdkFree.md)
+- [OesdkHeapBlock](OesdkHeapBlock.md)
+- [OesdkHeapIsInitialized](OesdkHeapIsInitialized.md)
+- [OESDK_HEAP_DEFAULT_ALIGNMENT](OESDK_HEAP_DEFAULT_ALIGNMENT.md)

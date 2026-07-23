@@ -1,4 +1,4 @@
-# OESDK 0.17.22
+# OESDK 0.17.23
 
 ## Bootstrap bump allocator contract
 

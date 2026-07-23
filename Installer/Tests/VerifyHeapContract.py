@@ -4,8 +4,8 @@ r=Path(__file__).resolve().parents[1]
 h=(r/'Include/oesdk/heap.h').read_text(); c=(r/'Source/heap.c').read_text(); k=(r/'Include/oesdk/kernel.h').read_text(); d=(r/'Docs/Kernel-Heap.md').read_text()
 for token in ['OesdkHeapBootstrapInitialize','OesdkHeapBootstrapAllocate','OesdkHeapBootstrapAllocateZeroed','OesdkHeapInformation']:
     assert token in h, token
-assert 'Result = AlignUp(Current, Alignment)' in c
-assert 'Next   = Result + Size' in c
+assert 'Result = AlignUp(Current, Alignment)' in d
+assert 'Next   = Result + RequestedSize' in d
 assert 'if (Next < Result || Next > OesdkHeapState.End) return NULL;' in c
 assert 'Count != 0U && Size > ((size_t)-1) / Count' in c
 assert 'OesdkHeapState.Current = Next;' in c

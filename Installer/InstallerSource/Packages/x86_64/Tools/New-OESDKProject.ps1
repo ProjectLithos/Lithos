@@ -98,6 +98,7 @@ void kmain(int argc, char *argv)
 #include <oesdk/kernel.h>
 
 static unsigned char TemplateBootstrapHeap[256U * 1024U] __attribute__((aligned(4096)));
+static unsigned char TemplatePermanentHeap[1024U * 1024U] __attribute__((aligned(4096)));
 
 typedef struct __attribute__((packed)) TemplateMultibootInformation
 {
@@ -284,11 +285,26 @@ static void DemonstrateKernelHeap(void)
     Zeroed = OesdkHeapBootstrapAllocateZeroed(32U, sizeof(uint32_t), 16U);
     OESDK_ASSERT(First != NULL && Zeroed != NULL);
     Information = OesdkHeapInformationGet();
-    kprintf("Heap: capacity=%llu used=%llu remaining=%llu allocations=%llu\n",
+    kprintf("Bootstrap heap: capacity=%llu used=%llu remaining=%llu allocations=%llu\n",
             (unsigned long long)Information->Capacity,
             (unsigned long long)Information->Used,
             (unsigned long long)Information->Remaining,
             (unsigned long long)Information->AllocationCount);
+
+    Status = OesdkHeapInitialize(TemplatePermanentHeap, sizeof(TemplatePermanentHeap));
+    kprintf("Permanent heap: %s\n", OesdkStatusName(Status));
+    OESDK_ASSERT(OESDK_SUCCEEDED(Status));
+    First = OesdkAllocate(96U);
+    Zeroed = OesdkAllocateZeroed(32U, sizeof(uint32_t));
+    OESDK_ASSERT(First != NULL && Zeroed != NULL);
+    OesdkFree(First);
+    OesdkFree(Zeroed);
+    Information = OesdkHeapInformationGet();
+    kprintf("Free-list heap: free=%llu blocks=%llu largest=%llu active=%llu\n",
+            (unsigned long long)Information->Remaining,
+            (unsigned long long)Information->FreeBlockCount,
+            (unsigned long long)Information->LargestFreeBlock,
+            (unsigned long long)Information->ActiveAllocationCount);
 }
 
 static void DemonstrateInterruptApi(void)

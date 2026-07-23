@@ -1,36 +1,75 @@
-# Kernel Heap — Bootstrap Bump Allocator
+# Kernel Heap — Free-list Allocator
 
-OESDK 0.17.22 provides the first kernel-heap stage: a deterministic bootstrap bump allocator. It is intended for early kernel construction, before the permanent free-list heap is available.
+OESDK 0.17.23 retains the bootstrap bump allocator and adds the permanent free-list heap. The bump allocator remains suitable while the permanent allocator is being constructed; after `OesdkHeapInitialize`, general kernel code uses `OesdkAllocate`, `OesdkAllocateAligned`, `OesdkAllocateZeroed`, and `OesdkFree`.
 
-## Allocation formula
+## Block layout
+
+```c
+typedef struct OesdkHeapBlock
+{
+    uint64_t Magic;
+    size_t Size;
+    bool Free;
+    struct OesdkHeapBlock *Previous;
+    struct OesdkHeapBlock *Next;
+} OesdkHeapBlock;
+```
+
+The magic value detects invalid headers. The doubly linked list permits constant-time neighbour access during coalescing.
+
+## Splitting
+
+A free block is split only when:
+
+```c
+OriginalSize >= RequestedSize
+              + HeaderSize
+              + MinimumBlockSize
+```
+
+Small unusable suffixes are absorbed into the allocation. Aligned allocation may also create a valid prefix free block; prefixes too small to hold a header and minimum payload are skipped by advancing to the next aligned address.
+
+## Coalescing
+
+Free neighbours are merged only when physically contiguous:
+
+```c
+Address(Block) + HeaderSize + Block.Size
+    == Address(Block.Next)
+```
+
+`OesdkFree` coalesces forward and backward, rebuilding larger reusable ranges and reducing fragmentation. Invalid pointers, double frees, and pointers outside the heap are ignored safely.
+
+## Public operations
+
+- `OesdkHeapInitialize` creates one initial free block over caller-supplied memory.
+- `OesdkAllocate` uses the natural pointer alignment.
+- `OesdkAllocateAligned` requires a non-zero power-of-two alignment.
+- `OesdkAllocateZeroed` rejects `Count × Size` overflow before allocation.
+- `OesdkFree` releases and coalesces an allocation.
+- `OesdkHeapInformationGet` reports capacity, used/free bytes, total and active allocations, free blocks, and the largest free block.
+
+## Zeroed allocation overflow
+
+```c
+if (Count != 0 && Size > SIZE_MAX / Count)
+    return NULL;
+```
+
+The freestanding implementation expresses `SIZE_MAX` portably as `((size_t)-1)`.
+
+## Bootstrap allocator
+
+The original bump formula remains available before permanent-heap initialization:
 
 ```c
 Result = AlignUp(Current, Alignment);
 Next   = Result + RequestedSize;
 ```
 
-The allocation succeeds only when all of the following are true:
+It still cannot free individual allocations. Allocation succeeds only when:
 
 ```c
-Alignment != 0
-Alignment is a power of two
-RequestedSize > 0
 Next >= Result
 Next <= HeapEnd
 ```
-
-`Next >= Result` ensures that `Result + RequestedSize` did not wrap around the address space. OESDK checks the addition before changing heap state.
-
-After a successful allocation, `Current` becomes `Next`. Failed allocations leave the heap unchanged. Alignment padding is counted as used heap space, because the bump pointer cannot move backwards.
-
-## Public operations
-
-- `OesdkHeapBootstrapInitialize` establishes `[Base, End)` and resets all statistics.
-- `OesdkHeapBootstrapAllocate` returns aligned, uninitialised storage.
-- `OesdkHeapBootstrapAllocateZeroed` performs overflow-safe `Count × Size` calculation and clears the allocation.
-- `OesdkHeapBootstrapIsInitialized` reports whether a heap has been configured.
-- `OesdkHeapInformationGet` exposes capacity, usage, remaining bytes, current pointer, end pointer, and allocation count.
-
-## Lifetime limitation
-
-A bump allocator cannot free individual allocations. This is intentional: it is small, predictable, and suitable while constructing page tables, object metadata, and the later permanent heap. The free-list allocator will replace it for general kernel allocation in a later revision.
