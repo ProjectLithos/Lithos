@@ -1,6 +1,6 @@
 # x86-64 Page-Table Manager
 
-OESDK 0.17.20 provides an explicit x86-64 page-table manager over the active CR3 address space. It deliberately retains the bootstrap identity map. A higher-half kernel relocation is deferred until mapping, translation, invalidation and allocation are dependable.
+OESDK 0.17.21 provides an explicit x86-64 page-table manager over the active CR3 address space. It deliberately retains the bootstrap identity map. A higher-half kernel relocation is deferred until mapping, translation, invalidation and allocation are dependable.
 
 ## 48-bit virtual-address layout
 

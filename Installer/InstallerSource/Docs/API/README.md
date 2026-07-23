@@ -221,3 +221,15 @@ When a public API function, function-like macro, or type is added to `Include/oe
 
 - [`OesdkVirtualAddressDecode`](OesdkVirtualAddressDecode.md)
 - [`OesdkVirtualAddressParts`](OesdkVirtualAddressParts.md)
+
+- [OesdkHeapInformation](OesdkHeapInformation.md)
+
+- [OesdkHeapBootstrapInitialize](OesdkHeapBootstrapInitialize.md)
+
+- [OesdkHeapBootstrapAllocate](OesdkHeapBootstrapAllocate.md)
+
+- [OesdkHeapBootstrapAllocateZeroed](OesdkHeapBootstrapAllocateZeroed.md)
+
+- [OesdkHeapBootstrapIsInitialized](OesdkHeapBootstrapIsInitialized.md)
+
+- [OesdkHeapInformationGet](OesdkHeapInformationGet.md)

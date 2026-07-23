@@ -17,10 +17,11 @@
 #include <oesdk/memory_map.h>
 #include <oesdk/physical_memory.h>
 #include <oesdk/virtual_memory.h>
+#include <oesdk/heap.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 17
-#define OESDK_VERSION_PATCH 20
+#define OESDK_VERSION_PATCH 21
 #define OESDK_VERSION_REVISION 0
 
 #endif

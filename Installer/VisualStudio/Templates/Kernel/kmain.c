@@ -1,5 +1,7 @@
 #include <oesdk/kernel.h>
 
+static unsigned char TemplateBootstrapHeap[256U * 1024U] __attribute__((aligned(4096)));
+
 typedef struct __attribute__((packed)) TemplateMultibootInformation
 {
     uint32_t Flags;
@@ -172,6 +174,26 @@ static void DemonstratePhysicalMemory(const OesdkBootContext *BootContext)
     }
 }
 
+
+static void DemonstrateKernelHeap(void)
+{
+    OesdkStatus Status = OesdkHeapBootstrapInitialize(TemplateBootstrapHeap, sizeof(TemplateBootstrapHeap));
+    void *First;
+    void *Zeroed;
+    const OesdkHeapInformation *Information;
+    kprintf("Bootstrap heap: %s\n", OesdkStatusName(Status));
+    OESDK_ASSERT(OESDK_SUCCEEDED(Status));
+    First = OesdkHeapBootstrapAllocate(96U, 16U);
+    Zeroed = OesdkHeapBootstrapAllocateZeroed(32U, sizeof(uint32_t), 16U);
+    OESDK_ASSERT(First != NULL && Zeroed != NULL);
+    Information = OesdkHeapInformationGet();
+    kprintf("Heap: capacity=%llu used=%llu remaining=%llu allocations=%llu\n",
+            (unsigned long long)Information->Capacity,
+            (unsigned long long)Information->Used,
+            (unsigned long long)Information->Remaining,
+            (unsigned long long)Information->AllocationCount);
+}
+
 static void DemonstrateInterruptApi(void)
 {
     OesdkStatus Status = OesdkInterruptHandlerRegister(
@@ -227,6 +249,7 @@ void kmain(int argc, char *argv)
     PrintDescriptorInformation();
     PrintMemoryMap(BootContext);
     DemonstratePhysicalMemory(BootContext);
+    DemonstrateKernelHeap();
     DemonstrateInterruptApi();
     DemonstrateGraphics();
 
