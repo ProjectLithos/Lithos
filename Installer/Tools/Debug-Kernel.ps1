@@ -83,9 +83,11 @@ echo.
 set "GdbExit=%errorlevel%"
 echo.
 echo [ OK ] GDB exited with code %GdbExit%.
+if not "%GdbExit%"=="0" if not "%GdbExit%"=="-1073741510" echo [WARN] GDB reported a non-zero exit code.
+taskkill /PID $($qemuProcess.Id) /F >nul 2>nul
 echo [ OK ] Press any key to close this debugger window.
 pause >nul
-exit /b %GdbExit%
+exit /b 0
 "@
 
     [IO.File]::WriteAllText(
@@ -101,20 +103,13 @@ exit /b %GdbExit%
         -FilePath $env:ComSpec `
         -ArgumentList @('/D', '/C', "`"$sessionFile`"") `
         -WorkingDirectory $projectBuild `
-        -PassThru `
-        -Wait
+        -PassThru
 
-    $gdbExit = $gdbConsole.ExitCode
-    "[ OK ] Interactive GDB console exited with code $gdbExit." |
+    "[ OK ] Interactive GDB console started with process id $($gdbConsole.Id)." |
         Add-Content -LiteralPath $debugLog -Encoding UTF8
-
-    if (-not $qemuProcess.HasExited) {
-        Stop-Process -Id $qemuProcess.Id -Force -ErrorAction SilentlyContinue
-    }
-
-    if ($gdbExit -ne 0) {
-        throw "GDB exited with code $gdbExit."
-    }
+    "[ OK ] QEMU process id: $($qemuProcess.Id)." |
+        Add-Content -LiteralPath $debugLog -Encoding UTF8
+    Write-Host "[ OK ] Debug session launched. Visual Studio may finish its wrapper process while GDB remains open."
 } catch {
     ($_ | Out-String) | Set-Content -LiteralPath $debugLog -Encoding UTF8
     Write-Host "[FAIL] Kernel debugging could not start."

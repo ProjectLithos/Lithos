@@ -114,3 +114,8 @@ OESDK generated projects use `Tools/VisualStudio-Launch.ps1` as the Visual Studi
 - **Ctrl+F5 / Start Without Debugging / outlined triangle**: the launcher is not itself debugged, so it runs `Run-Kernel.ps1` and starts QEMU normally without GDB.
 
 The text `Local Windows Debugger` is Visual Studio's built-in debugger-flavour label. It does not mean the kernel is a Windows program.
+
+
+## Visual Studio launch completion
+
+The Visual Studio wrapper starts the QEMU and GDB session asynchronously. It returns success after both processes have started; closing GDB with Ctrl+C or the window close button is treated as normal session termination rather than an SDK launch failure. The generated GDB session closes its matching QEMU process when the debugger window exits.

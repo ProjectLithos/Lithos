@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.33",
+  "sdkVersion": "0.17.34",
   "releaseStatus": "ready",
   "packages": [
     {
       "name": "OESDK Core",
-      "path": "ReleaseAssets/OESDK-Core-0.17.33.zip",
+      "path": "ReleaseAssets/OESDK-Core-0.17.34.zip",
       "sha256": "330D6A781467E33468AE5E27341FA9DCBA70B00C947C1B4457C8A27A94902BE6",
       "destination": "."
     },
     {
       "name": "OESDK x86-64 Support",
-      "path": "ReleaseAssets/OESDK-x86_64-0.17.33.zip",
+      "path": "ReleaseAssets/OESDK-x86_64-0.17.34.zip",
       "sha256": "30B232F5B86A48747179F53A98EDCEAD63E16BF368EBF38BB2431C08EF7E4C25",
       "destination": "."
     },
@@ -23,7 +23,7 @@
     },
     {
       "name": "OESDK Visual Studio Integration",
-      "path": "ReleaseAssets/OESDK-VisualStudio-0.17.33.zip",
+      "path": "ReleaseAssets/OESDK-VisualStudio-0.17.34.zip",
       "sha256": "1BE30099C434A8A4E39AF21C071F3F2E0969AC07A676A36E0B5A31E179AE2128",
       "destination": "."
     }

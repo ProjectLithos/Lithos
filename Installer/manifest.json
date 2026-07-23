@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.33",
+  "sdkVersion": "0.17.34",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.33",
+  "packageRevision": "0.17.34",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -99,7 +99,7 @@
     "timer": "Docs/Timer.md",
     "interruptControllerAndTimer": "Docs/Interrupt-Controller-and-Timer.md"
   },
-  "visualStudioSdkVersion": "0.17.33",
+  "visualStudioSdkVersion": "0.17.34",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
