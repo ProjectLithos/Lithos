@@ -30,10 +30,11 @@
 #include <oesdk/capability.h>
 #include <oesdk/event.h>
 #include <oesdk/module_manifest.h>
+#include <oesdk/smp.h>
 
 #define OESDK_VERSION_MAJOR 0
-#define OESDK_VERSION_MINOR 1
-#define OESDK_VERSION_PATCH 0
+#define OESDK_VERSION_MINOR 18
+#define OESDK_VERSION_PATCH 1
 #define OESDK_VERSION_REVISION 0
 
 #endif

@@ -366,3 +366,23 @@ See `../Processes-User-Mode-System-Calls-IPC.md` and the public headers for Addr
 - [`OesdkUserModeFrame`](OesdkUserModeFrame.md)
 - [`OesdkUserModeFramePrepare`](OesdkUserModeFramePrepare.md)
 - [`OesdkUserRangeValidate`](OesdkUserRangeValidate.md)
+
+## SMP startup
+
+- [`OesdkCpuStartupState`](OesdkCpuStartupState.md)
+- [`OesdkInterruptControllerCurrentApicId`](OesdkInterruptControllerCurrentApicId.md)
+- [`OesdkInterruptControllerSendInitIpi`](OesdkInterruptControllerSendInitIpi.md)
+- [`OesdkInterruptControllerSendStartupIpi`](OesdkInterruptControllerSendStartupIpi.md)
+- [`OesdkSmpApplicationProcessorMain`](OesdkSmpApplicationProcessorMain.md)
+- [`OesdkSmpApplicationProcessorOnline`](OesdkSmpApplicationProcessorOnline.md)
+- [`OesdkSmpConfiguration`](OesdkSmpConfiguration.md)
+- [`OesdkSmpCurrentApicId`](OesdkSmpCurrentApicId.md)
+- [`OesdkSmpCurrentProcessor`](OesdkSmpCurrentProcessor.md)
+- [`OesdkSmpInformation`](OesdkSmpInformation.md)
+- [`OesdkSmpInformationGet`](OesdkSmpInformationGet.md)
+- [`OesdkSmpInitialize`](OesdkSmpInitialize.md)
+- [`OesdkSmpIsBootstrapProcessor`](OesdkSmpIsBootstrapProcessor.md)
+- [`OesdkSmpProcessor`](OesdkSmpProcessor.md)
+- [`OesdkSmpProcessorGet`](OesdkSmpProcessorGet.md)
+- [`OesdkSmpSetProcessorResources`](OesdkSmpSetProcessorResources.md)
+- [`OesdkSmpStartApplicationProcessors`](OesdkSmpStartApplicationProcessors.md)

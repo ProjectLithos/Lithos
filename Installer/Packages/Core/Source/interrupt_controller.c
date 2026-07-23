@@ -147,3 +147,48 @@ bool OesdkInterruptControllerOwnsVector(uint8_t Vector)
 }
 
 const OesdkInterruptControllerInformation *OesdkInterruptControllerInformationGet(void) { return State.Initialized ? &State : NULL; }
+
+#define APIC_ICR_LOW_OFFSET  0x300U
+#define APIC_ICR_HIGH_OFFSET 0x310U
+#define APIC_ICR_DELIVERY_PENDING (1U << 12U)
+#define APIC_ICR_DELIVERY_INIT (5U << 8U)
+#define APIC_ICR_DELIVERY_STARTUP (6U << 8U)
+#define APIC_ICR_LEVEL_ASSERT (1U << 14U)
+#define APIC_ICR_TRIGGER_LEVEL (1U << 15U)
+#define X2APIC_ICR_MSR 0x830U
+
+static OesdkStatus SendIpi(uint32_t DestinationApicId, uint32_t Low)
+{
+    uint32_t Spins = 1000000U;
+    if (!State.Initialized) return OESDK_STATUS_NOT_FOUND;
+    if (State.Type == OesdkInterruptControllerX2Apic) {
+        WriteMsr(X2APIC_ICR_MSR, ((uint64_t)DestinationApicId << 32U) | Low);
+        return OESDK_STATUS_SUCCESS;
+    }
+    if (State.Type != OesdkInterruptControllerLocalApic) return OESDK_STATUS_NOT_SUPPORTED;
+    while ((MmioRead32(State.LocalApicBase + APIC_ICR_LOW_OFFSET) & APIC_ICR_DELIVERY_PENDING) != 0U) {
+        if (--Spins == 0U) return OESDK_STATUS_TIMEOUT;
+        OesdkCpuPause();
+    }
+    MmioWrite32(State.LocalApicBase + APIC_ICR_HIGH_OFFSET, DestinationApicId << 24U);
+    MmioWrite32(State.LocalApicBase + APIC_ICR_LOW_OFFSET, Low);
+    return OESDK_STATUS_SUCCESS;
+}
+
+OesdkStatus OesdkInterruptControllerSendInitIpi(uint32_t DestinationApicId)
+{
+    return SendIpi(DestinationApicId, APIC_ICR_DELIVERY_INIT | APIC_ICR_LEVEL_ASSERT | APIC_ICR_TRIGGER_LEVEL);
+}
+
+OesdkStatus OesdkInterruptControllerSendStartupIpi(uint32_t DestinationApicId, uint8_t StartupVector)
+{
+    return SendIpi(DestinationApicId, APIC_ICR_DELIVERY_STARTUP | StartupVector);
+}
+
+uint32_t OesdkInterruptControllerCurrentApicId(void)
+{
+    if (!State.Initialized) return UINT32_MAX;
+    if (State.Type == OesdkInterruptControllerX2Apic) return (uint32_t)ReadMsr(X2APIC_ID_MSR);
+    if (State.Type == OesdkInterruptControllerLocalApic) return MmioRead32(State.LocalApicBase + APIC_ID_OFFSET) >> 24U;
+    return State.LocalApicId;
+}

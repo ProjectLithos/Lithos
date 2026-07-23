@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.18.0",
+  "sdkVersion": "0.18.1",
   "releaseStatus": "ready",
   "packages": [
     {
       "name": "OESDK Core",
-      "path": "ReleaseAssets/OESDK-Core-0.18.0.zip",
-      "sha256": "66ACF3E22E014FDFF0A57BE39BB08D4F5B27FCD642BFD2B692213F463D600589",
+      "path": "ReleaseAssets/OESDK-Core-0.18.1.zip",
+      "sha256": "C9A17B186EDDAF1A1ED2987001784E0591E50071446CC9200D261BAFB44103CE",
       "destination": "."
     },
     {
       "name": "OESDK x86-64 Support",
-      "path": "ReleaseAssets/OESDK-x86_64-0.18.0.zip",
-      "sha256": "339E4C8E44DCD77EE17478A6F24E69F9548E6B53FCD9B1716A2589E171F9DD1D",
+      "path": "ReleaseAssets/OESDK-x86_64-0.18.1.zip",
+      "sha256": "7DC0EB8287E13DEDA71002D2EB9F5CFA60420110FD17826E16C368A2A6F082C0",
       "destination": "."
     },
     {
@@ -23,8 +23,8 @@
     },
     {
       "name": "OESDK Visual Studio Integration",
-      "path": "ReleaseAssets/OESDK-VisualStudio-0.18.0.zip",
-      "sha256": "1BE30099C434A8A4E39AF21C071F3F2E0969AC07A676A36E0B5A31E179AE2128",
+      "path": "ReleaseAssets/OESDK-VisualStudio-0.18.1.zip",
+      "sha256": "B5ED0B019DFD19705527EAD5216AC23E995E94E24A2C2C40876E092A979528C0",
       "destination": "."
     }
   ],
