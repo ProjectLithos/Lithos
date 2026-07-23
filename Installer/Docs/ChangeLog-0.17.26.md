@@ -1,4 +1,4 @@
-# OESDK 0.17.27
+# OESDK 0.17.28
 
 - Replaced GNU aligned-array syntax in generated kernels with C11 `_Alignas`.
 - Disabled incompatible QEMU remote packets before connecting GDB.

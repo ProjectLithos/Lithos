@@ -15,8 +15,11 @@ __attribute__((noreturn)) void oesdk_runtime_start(uint32_t multiboot_magic, uin
     if (!OesdkGdtInitialize()) {
         OesdkPanic("GDT", "Initialization failed", 0x0000000000000012ULL);
     }
-    if (!OesdkIdtInitialize()) {
-        OesdkPanic("IDT", "Initialization failed", 0x0000000000000013ULL);
+    {
+        OesdkStatus Status = OesdkIdtInitialize();
+        if (OESDK_FAILED(Status)) {
+            OesdkPanic("IDT", "Initialization failed", 0x0000000000000013ULL);
+        }
     }
     if (!OesdkBootContextInitialize(multiboot_magic, multiboot_information)) {
         OesdkPanic("BootContext", "Initialization failed", 0x0000000000000010ULL);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.27",
+  "sdkVersion": "0.17.28",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.27",
+  "packageRevision": "0.17.28",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -95,7 +95,7 @@
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md"
   },
-  "visualStudioSdkVersion": "0.17.27",
+  "visualStudioSdkVersion": "0.17.28",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
