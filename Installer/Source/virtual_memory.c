@@ -54,14 +54,20 @@ static OesdkPageTable *PhysicalTable(uint64_t PhysicalAddress)
     return (OesdkPageTable *)(uintptr_t)(PhysicalAddress & ENTRY_ADDRESS_MASK);
 }
 
+static bool RangeBytes(size_t PageCount, uintptr_t *MappedBytes)
+{
+    if (MappedBytes == NULL || PageCount == 0U) return false;
+    if (PageCount > (size_t)(UINTPTR_MAX / OESDK_VIRTUAL_PAGE_SIZE)) return false;
+    *MappedBytes = (uintptr_t)PageCount * (uintptr_t)OESDK_VIRTUAL_PAGE_SIZE;
+    return *MappedBytes != 0U;
+}
+
 static bool AddRange(uintptr_t Address, size_t PageCount, uintptr_t *LastAddress)
 {
-    uint64_t Bytes;
-    if (LastAddress == NULL || PageCount == 0U) return false;
-    if ((uint64_t)PageCount > UINT64_MAX / OESDK_VIRTUAL_PAGE_SIZE) return false;
-    Bytes = (uint64_t)PageCount * OESDK_VIRTUAL_PAGE_SIZE;
-    if (Bytes == 0U || UINTPTR_MAX - Address < (uintptr_t)(Bytes - 1U)) return false;
-    *LastAddress = Address + (uintptr_t)(Bytes - 1U);
+    uintptr_t MappedBytes;
+    if (LastAddress == NULL || !RangeBytes(PageCount, &MappedBytes)) return false;
+    if (Address > UINTPTR_MAX - (MappedBytes - 1U)) return false;
+    *LastAddress = Address + MappedBytes - 1U;
     return true;
 }
 
@@ -228,7 +234,7 @@ OesdkStatus OesdkVirtualMemoryInitialize(void)
     return OESDK_STATUS_SUCCESS;
 }
 
-OesdkStatus OesdkVirtualMap(uintptr_t VirtualAddress, uintptr_t PhysicalAddress, size_t PageCount, OesdkVirtualFlags Flags)
+OesdkStatus OesdkVirtualMap(uintptr_t VirtualAddress, uintptr_t PhysicalAddress, size_t PageCount, uint64_t Flags)
 {
     uintptr_t VirtualLast;
     uintptr_t PhysicalLast;
@@ -236,6 +242,7 @@ OesdkStatus OesdkVirtualMap(uintptr_t VirtualAddress, uintptr_t PhysicalAddress,
     uint64_t *Leaf;
     OesdkStatus Status;
     if (!Information.Initialized || PageCount == 0U) return OESDK_STATUS_INVALID_ARGUMENT;
+    if ((Flags & ~OESDK_VIRTUAL_FLAGS_ALL) != 0U) return OESDK_STATUS_INVALID_ARGUMENT;
     if ((((uint64_t)VirtualAddress | (uint64_t)PhysicalAddress) & OESDK_VIRTUAL_PAGE_MASK) != 0U) return OESDK_STATUS_INVALID_ARGUMENT;
     if (!AddRange(VirtualAddress, PageCount, &VirtualLast) || !AddRange(PhysicalAddress, PageCount, &PhysicalLast)) return OESDK_STATUS_CORRUPT;
     if (!OesdkVirtualAddressIsCanonical(VirtualAddress) || !OesdkVirtualAddressIsCanonical(VirtualLast)) return OESDK_STATUS_INVALID_ARGUMENT;

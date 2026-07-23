@@ -33,6 +33,10 @@ extern "C" {
 #define OESDK_VIRTUAL_FLAG_CACHE_DISABLE (1ULL << 4)
 #define OESDK_VIRTUAL_FLAG_GLOBAL        (1ULL << 8)
 #define OESDK_VIRTUAL_FLAG_NO_EXECUTE    (1ULL << 63)
+#define OESDK_VIRTUAL_FLAGS_ALL          (OESDK_VIRTUAL_FLAG_PRESENT | OESDK_VIRTUAL_FLAG_WRITABLE | \
+                                          OESDK_VIRTUAL_FLAG_USER | OESDK_VIRTUAL_FLAG_WRITE_THROUGH | \
+                                          OESDK_VIRTUAL_FLAG_CACHE_DISABLE | OESDK_VIRTUAL_FLAG_GLOBAL | \
+                                          OESDK_VIRTUAL_FLAG_NO_EXECUTE)
 
 typedef uint64_t OesdkVirtualFlags;
 
@@ -64,7 +68,7 @@ OesdkStatus OesdkVirtualMap(
     uintptr_t VirtualAddress,
     uintptr_t PhysicalAddress,
     size_t PageCount,
-    OesdkVirtualFlags Flags);
+    uint64_t Flags);
 OesdkStatus OesdkVirtualUnmap(uintptr_t VirtualAddress, size_t PageCount);
 bool OesdkVirtualTranslate(uintptr_t VirtualAddress, uintptr_t *PhysicalAddress);
 bool OesdkVirtualMemoryIsInitialized(void);

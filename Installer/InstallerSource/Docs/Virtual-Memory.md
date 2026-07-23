@@ -1,6 +1,6 @@
 # x86-64 Page-Table Manager
 
-OESDK 0.17.19 provides an explicit x86-64 page-table manager over the active CR3 address space. It deliberately retains the bootstrap identity map. A higher-half kernel relocation is deferred until mapping, translation, invalidation and allocation are dependable.
+OESDK 0.17.20 provides an explicit x86-64 page-table manager over the active CR3 address space. It deliberately retains the bootstrap identity map. A higher-half kernel relocation is deferred until mapping, translation, invalidation and allocation are dependable.
 
 ## 48-bit virtual-address layout
 
@@ -36,7 +36,7 @@ For 48-bit addressing, bits 63-48 must equal bit 47. Therefore the valid ranges 
 ## Mapper API
 
 - `OesdkVirtualMemoryInitialize` adopts the active CR3 root and enables EFER.NXE when supported.
-- `OesdkVirtualMap` maps aligned 4 KiB pages with explicit writable, user, cache, global and no-execute flags.
+- `OesdkVirtualMap` uses the exact public mapping signature and accepts explicit Present, Writable, User, WriteThrough, CacheDisable, Global and NoExecute flags.
 - `OesdkVirtualUnmap` removes 4 KiB mappings and invalidates each TLB entry.
 - `OesdkVirtualTranslate` resolves existing 4 KiB, 2 MiB and 1 GiB mappings.
 - `OesdkVirtualAddressDecode` exposes the PML4, PDPT, PD, PT and offset split without walking tables.
@@ -46,3 +46,7 @@ The manager splits an existing 2 MiB bootstrap mapping into a 4 KiB page table w
 ## Current layout policy
 
 The active bootstrap identity map is preserved. `OESDK_KERNEL_HIGHER_HALF_BASE` is a layout constant for a later revision, not evidence that the current kernel has already moved. This avoids combining a relocation change with the initial mapper implementation.
+
+## Overflow-safe page ranges
+
+Both mapping and unmapping validate the complete byte range before changing a page table. The implementation checks `PageCount <= UINTPTR_MAX / 4096` before calculating `MappedBytes = PageCount * 4096`, then verifies that adding `MappedBytes - 1` to the start address cannot wrap. Unknown mapping flag bits are rejected.
