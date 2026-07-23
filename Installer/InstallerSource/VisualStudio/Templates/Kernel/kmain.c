@@ -1,7 +1,7 @@
 #include <oesdk/kernel.h>
 
-static unsigned char TemplateBootstrapHeap[256U * 1024U] __attribute__((aligned(4096)));
-static unsigned char TemplatePermanentHeap[1024U * 1024U] __attribute__((aligned(4096)));
+_Alignas(4096) static unsigned char TemplateBootstrapHeap[256U * 1024U];
+_Alignas(4096) static unsigned char TemplatePermanentHeap[1024U * 1024U];
 
 typedef struct TemplateMultibootInformation
 {

@@ -1,4 +1,4 @@
-# OESDK 0.17.25
+# OESDK 0.17.26
 
 - Fixed the base kernel template so Visual Studio IntelliSense can parse `TemplateMultibootInformation`.
 - Removed the unnecessary GNU `__attribute__((packed))` from that structure; all fields are naturally 32-bit aligned and the required Multiboot layout is unchanged.

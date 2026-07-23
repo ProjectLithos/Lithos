@@ -48,8 +48,8 @@ function Find-OesdkDebugger {
     $sdkRoot = Get-OesdkRoot
     $candidates = @(
         $configured,
-        'C:\msys64\ucrt64\bin\gdb-multiarch.exe',
         'C:\msys64\ucrt64\bin\gdb.exe',
+        'C:\msys64\ucrt64\bin\gdb-multiarch.exe',
         (Join-Path $sdkRoot 'Tools\x86_64-elf-gdb.exe'),
         (Join-Path $sdkRoot 'Tools\bin\x86_64-elf-gdb.exe')
     )
@@ -69,7 +69,7 @@ function Find-OesdkDebugger {
         }
     }
 
-    foreach ($name in @('gdb-multiarch.exe', 'x86_64-elf-gdb.exe', 'gdb.exe')) {
+    foreach ($name in @('gdb.exe', 'x86_64-elf-gdb.exe', 'gdb-multiarch.exe')) {
         $command = Get-Command $name -ErrorAction SilentlyContinue
         if ($command) {
             & $command.Source --version *> $null

@@ -27,6 +27,9 @@ try {
         'set confirm off',
         'set pagination off',
         'set disassembly-flavor intel',
+        'set remote hostio-setfs-packet off',
+        'set remote verbose-resume-packet off',
+        'set remote noack-packet off',
         ('file "' + $escapedKernel + '"'),
         ('target remote 127.0.0.1:' + $Port)
     )

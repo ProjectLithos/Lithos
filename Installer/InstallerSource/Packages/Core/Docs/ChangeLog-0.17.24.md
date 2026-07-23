@@ -1,4 +1,4 @@
-# OESDK 0.17.25
+# OESDK 0.17.26
 
 - Added common timer API.
 - Added PIT periodic timer programming using the 1,193,182 Hz input clock.

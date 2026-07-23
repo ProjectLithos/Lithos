@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.25",
+  "sdkVersion": "0.17.26",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.25",
+  "packageRevision": "0.17.26",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -54,7 +54,7 @@
   },
   "debugging": {
     "visualStudioLocalWindowsDebuggerRemoved": true,
-    "guestDebugger": "MSYS2 GDB multiarch",
+    "guestDebugger": "MSYS2 GDB",
     "qemuGdbServer": "127.0.0.1:1234",
     "script": "Tools/Debug-Kernel.ps1",
     "symbols": "Build/<Configuration>/kernel.elf",
@@ -63,11 +63,16 @@
     "fallbackDebugger": "Visual Studio LLDB",
     "diagnosticLog": "Build/Debug/oesdk-debug.log",
     "launcherLog": "Build/Debug/oesdk-launcher.log",
-    "debuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb-multiarch.exe",
+    "debuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
     "lldbFallbackRemoved": true,
     "interactiveConsole": true,
     "interactiveConsoleTitle": "OESDK Kernel Debugger - GDB",
-    "gdbSessionFile": "Build/Debug/Start-Gdb-Session.cmd"
+    "gdbSessionFile": "Build/Debug/Start-Gdb-Session.cmd",
+    "qemuCompatibilityPacketsDisabled": [
+      "hostio-setfs",
+      "verbose-resume",
+      "noack"
+    ]
   },
   "templatesRemoved": [
     "*Oryn*"
@@ -90,7 +95,7 @@
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md"
   },
-  "visualStudioSdkVersion": "0.17.25",
+  "visualStudioSdkVersion": "0.17.26",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
