@@ -15,6 +15,16 @@ static bool IsPowerOfTwo(size_t Value)
     return Value != 0U && (Value & (Value - 1U)) == 0U;
 }
 
+static bool AlignUp(uintptr_t Value, size_t Alignment, uintptr_t *Result)
+{
+    uintptr_t Mask;
+    if (Result == NULL || !IsPowerOfTwo(Alignment)) return false;
+    Mask = (uintptr_t)Alignment - 1U;
+    if (Value > UINTPTR_MAX - Mask) return false;
+    *Result = (Value + Mask) & ~Mask;
+    return true;
+}
+
 OesdkStatus OesdkHeapBootstrapInitialize(void *Base, size_t Size)
 {
     uintptr_t Start;
@@ -35,14 +45,23 @@ OesdkStatus OesdkHeapBootstrapInitialize(void *Base, size_t Size)
 
 void *OesdkHeapBootstrapAllocate(size_t Size, size_t Alignment)
 {
-    uintptr_t Mask;
     uintptr_t Result;
     uintptr_t Next;
-    if (!OesdkHeapState.Initialized || Size == 0U || !IsPowerOfTwo(Alignment)) return NULL;
-    Mask = (uintptr_t)Alignment - 1U;
-    if (OesdkHeapState.Current > UINTPTR_MAX - Mask) return NULL;
-    Result = (OesdkHeapState.Current + Mask) & ~Mask;
-    if (AddOverflow(Result, (uintptr_t)Size, &Next) || Next > OesdkHeapState.End) return NULL;
+
+    if (!OesdkHeapState.Initialized || Size == 0U) return NULL;
+    if (!AlignUp(OesdkHeapState.Current, Alignment, &Result)) return NULL;
+
+    /*
+     * Bootstrap bump allocation contract:
+     *   Result = AlignUp(Current, Alignment)
+     *   Next   = Result + Size
+     *
+     * Allocation succeeds only when the addition does not wrap
+     * (Next >= Result) and the result remains within HeapEnd.
+     */
+    if (AddOverflow(Result, (uintptr_t)Size, &Next)) return NULL;
+    if (Next < Result || Next > OesdkHeapState.End) return NULL;
+
     OesdkHeapState.Current = Next;
     OesdkHeapState.Used = (size_t)(Next - OesdkHeapState.Base);
     OesdkHeapState.Remaining = (size_t)(OesdkHeapState.End - Next);

@@ -1,4 +1,4 @@
-# OESDK 0.17.21
+# OESDK 0.17.22
 
 - Formalised the public virtual mapping, unmapping, and translation interfaces.
 - Changed the mapping parameter to the requested public `uint64_t Flags` type.
