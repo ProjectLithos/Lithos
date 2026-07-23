@@ -113,12 +113,16 @@ boot_information:
     .skip 4
 
 .balign 4096
+.global __bootstrap_page_tables_start
+.global __bootstrap_page_tables_end
+__bootstrap_page_tables_start:
 page_map_level4:
     .skip 4096
 page_directory_pointer:
     .skip 4096
 page_directories:
     .skip 16384
+__bootstrap_page_tables_end:
 
 .balign 16
 .global __bootstrap_stack_bottom

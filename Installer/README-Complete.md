@@ -29,6 +29,6 @@ OESDK projects produce a symbol-rich `Build/Debug/kernel.elf`. Press F5 in a con
 
 ## Version
 
-- SDK package: `0.17.16`
+- SDK package: `0.17.17`
 - API documentation contract introduced in this refreshed package
 - The updater keeps its own independent file version and is not versioned from the SDK package number

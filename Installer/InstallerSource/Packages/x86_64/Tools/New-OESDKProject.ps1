@@ -222,13 +222,46 @@ static void PrintMemoryMap(const OesdkBootContext *BootContext)
         const OesdkMemoryRegion *Region = &OesdkMemoryMapRegions()[Index];
         uint64_t End = 0U;
         if (!OesdkMemoryRangeEnd(Region, &End)) {
-            OESDK_PANIC("MemoryMap", "A normalised range became invalid", 0x17160001ULL);
+            OESDK_PANIC("MemoryMap", "A normalised range became invalid", 0x17170001ULL);
         }
         kdebugf("Memory[%llu] 0x%llx-0x%llx type=%u\n",
                 (unsigned long long)Index,
                 (unsigned long long)Region->Base,
                 (unsigned long long)End,
                 (unsigned int)Region->Type);
+    }
+}
+
+static void DemonstratePhysicalMemory(const OesdkBootContext *BootContext)
+{
+    OesdkStatus Status;
+    uint64_t PhysicalAddress = 0U;
+    const OesdkPhysicalMemoryInformation *Memory;
+
+    if (OesdkMemoryMapRegionCount() == 0U) {
+        kprintf("Physical allocator: no normalised memory map.\n");
+        return;
+    }
+
+    Status = OesdkPhysicalMemoryInitialize(
+        OesdkMemoryMapRegions(),
+        OesdkMemoryMapRegionCount(),
+        BootContext);
+    kprintf("Physical allocator: %s\n", OesdkStatusName(Status));
+    if (OESDK_FAILED(Status)) return;
+
+    Memory = OesdkPhysicalMemoryInformationGet();
+    OESDK_ASSERT(Memory != NULL);
+    kprintf("Physical pages: total=%llu free=%llu reserved=%llu bitmap=%llu bytes\n",
+            (unsigned long long)Memory->PageCount,
+            (unsigned long long)Memory->FreePageCount,
+            (unsigned long long)Memory->ReservedPageCount,
+            (unsigned long long)Memory->BitmapBytes);
+
+    Status = OesdkPhysicalMemoryAllocate(1U, &PhysicalAddress);
+    if (OESDK_SUCCEEDED(Status)) {
+        kprintf("Allocated test frame: 0x%llx\n", (unsigned long long)PhysicalAddress);
+        OESDK_ASSERT(OESDK_SUCCEEDED(OesdkPhysicalMemoryFree(PhysicalAddress, 1U)));
     }
 }
 
@@ -280,12 +313,13 @@ void kmain(int argc, char *argv)
     kdebugf("__PROJECT_NAME__: serial debugging is active.\n");
 
     BootContext = OesdkBootContextGet();
-    OESDK_ASSERT_CODE(BootContext != NULL, 0x17160002ULL);
+    OESDK_ASSERT_CODE(BootContext != NULL, 0x17170002ULL);
 
     PrintBootContext(BootContext);
     PrintCpuInformation();
     PrintDescriptorInformation();
     PrintMemoryMap(BootContext);
+    DemonstratePhysicalMemory(BootContext);
     DemonstrateInterruptApi();
     DemonstrateGraphics();
 
@@ -302,7 +336,7 @@ $source = $source.Replace('__PROJECT_NAME__', $ProjectName)
 $readme = @"
 # $ProjectName
 
-This is an OESDK 0.17.16 native Clang C $ProjectType project. It is a `.vcxproj`,
+This is an OESDK 0.17.17 native Clang C $ProjectType project. It is a `.vcxproj`,
 not a C# `.csproj`, and does not require the Microsoft .NET SDK.
 
 Build Debug or Release in Visual Studio, then use Start Without Debugging to

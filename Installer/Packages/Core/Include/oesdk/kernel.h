@@ -15,10 +15,11 @@
 #include <oesdk/gdt.h>
 #include <oesdk/interrupt.h>
 #include <oesdk/memory_map.h>
+#include <oesdk/physical_memory.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 17
-#define OESDK_VERSION_PATCH 16
+#define OESDK_VERSION_PATCH 17
 #define OESDK_VERSION_REVISION 0
 
 #endif

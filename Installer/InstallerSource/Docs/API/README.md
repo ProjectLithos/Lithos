@@ -117,6 +117,28 @@ Every public function, function-like macro, and public SDK type has its own Mark
 - [`OesdkStatusName`](./OesdkStatusName.md) — function
 - [`OesdkStatusDescription`](./OesdkStatusDescription.md) — function
 
+## Physical memory
+
+- [`OESDK_PAGE_MASK`](./OESDK_PAGE_MASK.md)
+- [`OESDK_PHYSICAL_MAX_BYTES`](./OESDK_PHYSICAL_MAX_BYTES.md)
+- [`OesdkPhysicalMemoryInformation`](./OesdkPhysicalMemoryInformation.md)
+- [`OesdkAlignmentIsPowerOfTwo`](./OesdkAlignmentIsPowerOfTwo.md)
+- [`OesdkAlignDownU64`](./OesdkAlignDownU64.md)
+- [`OesdkAlignUpU64`](./OesdkAlignUpU64.md)
+- [`OesdkPhysicalAddressToPage`](./OesdkPhysicalAddressToPage.md)
+- [`OesdkPhysicalPageToAddress`](./OesdkPhysicalPageToAddress.md)
+- [`OesdkPhysicalMemoryInitialize`](./OesdkPhysicalMemoryInitialize.md)
+- [`OesdkPhysicalMemoryReserve`](./OesdkPhysicalMemoryReserve.md)
+- [`OesdkPhysicalMemoryAllocate`](./OesdkPhysicalMemoryAllocate.md)
+- [`OesdkPhysicalMemoryFree`](./OesdkPhysicalMemoryFree.md)
+- [`OesdkPhysicalMemoryPageIsAllocated`](./OesdkPhysicalMemoryPageIsAllocated.md)
+- [`OesdkPhysicalMemoryPageIsPermanent`](./OesdkPhysicalMemoryPageIsPermanent.md)
+- [`OesdkPhysicalMemoryIsInitialized`](./OesdkPhysicalMemoryIsInitialized.md)
+- [`OesdkPhysicalMemoryInformationGet`](./OesdkPhysicalMemoryInformationGet.md)
+- [`OESDK_IS_POWER_OF_TWO`](./OESDK_IS_POWER_OF_TWO.md)
+- [`OESDK_ALIGN_DOWN`](./OESDK_ALIGN_DOWN.md)
+- [`OESDK_ALIGN_UP`](./OESDK_ALIGN_UP.md)
+
 ## Documentation maintenance rule
 
 When a public API function, function-like macro, or type is added to `Include/oesdk`, the same change must:

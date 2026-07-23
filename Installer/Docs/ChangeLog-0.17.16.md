@@ -1,4 +1,4 @@
-# OESDK 0.17.16
+# OESDK 0.17.17
 
 ## Base template coverage
 

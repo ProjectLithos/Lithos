@@ -1,7 +1,7 @@
 # OESDK Base Kernel Template
 
 This native Clang C template demonstrates every core service currently linked by
-OESDK 0.17.16. The OESDK runtime initializes the serial port, CPU feature layer,
+OESDK 0.17.17. The OESDK runtime initializes the serial port, CPU feature layer,
 kernel-owned GDT/TSS, IDT, boot context, console and graphics surface before
 calling `kmain`.
 

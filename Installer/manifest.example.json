@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.16",
+  "sdkVersion": "0.17.17",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.16",
+  "packageRevision": "0.17.17",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -86,9 +86,10 @@
     "idtAndExceptions": "Docs/IDT-and-Exceptions.md",
     "apiReference": "Docs/API/README.md",
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
-    "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md"
+    "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
+    "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md"
   },
-  "visualStudioSdkVersion": "0.17.16",
+  "visualStudioSdkVersion": "0.17.17",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -152,5 +153,20 @@
   },
   "templateSafety": {
     "integerFormattingExamples": true
+  },
+  "physicalMemory": {
+    "pageSize": 4096,
+    "pageShift": 12,
+    "allocator": "bitmap",
+    "permanentReservations": [
+      "page-zero",
+      "kernel-image",
+      "bootstrap-stack",
+      "bootstrap-page-tables",
+      "multiboot-structures",
+      "memory-map-storage",
+      "framebuffer",
+      "allocator-bitmaps"
+    ]
   }
 }
