@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.34",
+  "sdkVersion": "0.17.35",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.34",
+  "packageRevision": "0.17.35",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -54,7 +54,7 @@
   },
   "debugging": {
     "visualStudioLocalWindowsDebuggerRemoved": true,
-    "guestDebugger": "MSYS2 GDB multiarch",
+    "guestDebugger": "MSYS2 GDB",
     "qemuGdbServer": "127.0.0.1:1234",
     "script": "Tools/Debug-Kernel.ps1",
     "symbols": "Build/<Configuration>/kernel.elf",
@@ -63,11 +63,16 @@
     "fallbackDebugger": "Visual Studio LLDB",
     "diagnosticLog": "Build/Debug/oesdk-debug.log",
     "launcherLog": "Build/Debug/oesdk-launcher.log",
-    "debuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb-multiarch.exe",
+    "debuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
     "lldbFallbackRemoved": true,
     "interactiveConsole": true,
     "interactiveConsoleTitle": "OESDK Kernel Debugger - GDB",
     "gdbSessionFile": "Build/Debug/Start-Gdb-Session.cmd",
+    "qemuCompatibilityPacketsDisabled": [
+      "hostio-setfs",
+      "verbose-resume",
+      "noack"
+    ],
     "visualStudioLauncherLog": "Build/<Configuration>/oesdk-visualstudio-launch.log",
     "launcherFailurePause": true
   },
@@ -91,9 +96,11 @@
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md",
-    "interruptControllerAndTimer": "Docs/Interrupt-Controller-and-Timer.md"
+    "timer": "Docs/Timer.md",
+    "interruptControllerAndTimer": "Docs/Interrupt-Controller-and-Timer.md",
+    "threadsAndScheduler": "Docs/Threads-and-Scheduler.md"
   },
-  "visualStudioSdkVersion": "0.17.34",
+  "visualStudioSdkVersion": "0.17.35",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -186,6 +193,27 @@
       "nx"
     ]
   },
+  "kernelHeap": {
+    "bootstrapAllocator": true,
+    "freeListAllocator": true,
+    "blockSplitting": true,
+    "contiguousCoalescing": true,
+    "alignedAllocation": true,
+    "zeroedAllocation": true
+  },
+  "timer": {
+    "sources": [
+      "pit",
+      "local-apic",
+      "x2apic",
+      "hpet"
+    ],
+    "pitBaseFrequencyHz": 1193182,
+    "defaultVector": 32,
+    "overflowSafeConversions": true,
+    "interruptControllerRoutingRequired": false,
+    "runtimePitHz": 100
+  },
   "interruptController": {
     "bootstrap": "pic",
     "picVectors": "32-47",
@@ -194,5 +222,20 @@
     "localApic": true,
     "x2Apic": true,
     "ioApicRouting": true
+  },
+  "scheduler": {
+    "maximumThreads": 64,
+    "policy": "round-robin",
+    "defaultQuantumMilliseconds": 15,
+    "states": [
+      "created",
+      "ready",
+      "running",
+      "blocked",
+      "sleeping",
+      "terminated"
+    ],
+    "timerTickAccounting": true,
+    "architectureContext": "x86_64"
   }
 }

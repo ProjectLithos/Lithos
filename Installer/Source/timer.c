@@ -2,6 +2,7 @@
 #include <oesdk/cpu.h>
 #include <oesdk/interrupt.h>
 #include <oesdk/interrupt_controller.h>
+#include <oesdk/scheduler.h>
 
 #define OESDK_PIT_CHANNEL0_PORT 0x40U
 #define OESDK_PIT_COMMAND_PORT 0x43U
@@ -58,6 +59,7 @@ static void OesdkTimerInterrupt(OesdkInterruptFrame *Frame, void *Context)
     (void)Frame;
     (void)Context;
     ++OesdkTimerTickCounter;
+    OesdkSchedulerOnTimerTick(OesdkTimerTickCounter);
 }
 
 static OesdkStatus OesdkTimerBegin(OesdkTimerSource Source, uint8_t Vector)

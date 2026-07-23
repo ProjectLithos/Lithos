@@ -286,3 +286,27 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [`OESDK_IOAPIC_TRIGGER_LEVEL`](OESDK_IOAPIC_TRIGGER_LEVEL.md)
 
 - [`OESDK_IOAPIC_MASKED`](OESDK_IOAPIC_MASKED.md)
+
+## Threads and Scheduler
+
+- [`OESDK_THREAD_DEFAULT_STACK_BYTES`](./OESDK_THREAD_DEFAULT_STACK_BYTES.md) — macro
+- [`OesdkThreadId`](./OesdkThreadId.md) — type
+- [`OesdkThreadState`](./OesdkThreadState.md) — type
+- [`OesdkThreadWaitReason`](./OesdkThreadWaitReason.md) — type
+- [`OesdkThreadContext`](./OesdkThreadContext.md) — type
+- [`OesdkThread`](./OesdkThread.md) — type
+- [`OesdkSchedulerInformation`](./OesdkSchedulerInformation.md) — type
+- [`OesdkSchedulerQuantumTicks`](./OesdkSchedulerQuantumTicks.md) — function
+- [`OesdkSchedulerInitialize`](./OesdkSchedulerInitialize.md) — function
+- [`OesdkThreadCreate`](./OesdkThreadCreate.md) — function
+- [`OesdkThreadMakeReady`](./OesdkThreadMakeReady.md) — function
+- [`OesdkThreadBlock`](./OesdkThreadBlock.md) — function
+- [`OesdkThreadSleep`](./OesdkThreadSleep.md) — function
+- [`OesdkThreadTerminate`](./OesdkThreadTerminate.md) — function
+- [`OesdkThreadInformationGet`](./OesdkThreadInformationGet.md) — function
+- [`OesdkSchedulerCurrentThread`](./OesdkSchedulerCurrentThread.md) — function
+- [`OesdkSchedulerSelectNext`](./OesdkSchedulerSelectNext.md) — function
+- [`OesdkSchedulerOnTimerTick`](./OesdkSchedulerOnTimerTick.md) — function
+- [`OesdkSchedulerReschedulePending`](./OesdkSchedulerReschedulePending.md) — function
+- [`OesdkSchedulerRescheduleAcknowledged`](./OesdkSchedulerRescheduleAcknowledged.md) — function
+- [`OesdkSchedulerInformationGet`](./OesdkSchedulerInformationGet.md) — function

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.34",
+  "sdkVersion": "0.17.35",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.34",
+  "packageRevision": "0.17.35",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -95,9 +95,10 @@
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
-    "virtualMemory": "Docs/Virtual-Memory.md"
+    "virtualMemory": "Docs/Virtual-Memory.md",
+    "threadsAndScheduler": "Docs/Threads-and-Scheduler.md"
   },
-  "visualStudioSdkVersion": "0.17.34",
+  "visualStudioSdkVersion": "0.17.35",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -197,5 +198,20 @@
     "contiguousCoalescing": true,
     "alignedAllocation": true,
     "zeroedAllocation": true
+  },
+  "scheduler": {
+    "maximumThreads": 64,
+    "policy": "round-robin",
+    "defaultQuantumMilliseconds": 15,
+    "states": [
+      "created",
+      "ready",
+      "running",
+      "blocked",
+      "sleeping",
+      "terminated"
+    ],
+    "timerTickAccounting": true,
+    "architectureContext": "x86_64"
   }
 }
