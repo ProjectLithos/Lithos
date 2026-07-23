@@ -56,6 +56,9 @@ for name, token in required.items():
 assert 'OesdkLibcInitialize' not in text, 'optional separately linked Newlib must not be presented as core runtime initialization'
 assert 'OesdkCpuEnableInterrupts()' not in text, 'template must not enable hardware interrupts before an interrupt controller exists'
 
+assert '__attribute__((packed)) TemplateMultibootInformation' not in text, 'base template must remain parseable by Visual Studio IntelliSense'
+assert 'typedef struct TemplateMultibootInformation' in text, 'portable Multiboot information declaration is missing'
+
 for rel in [
     'Tools/New-OESDKProject.ps1',
     'Packages/x86_64/Tools/New-OESDKProject.ps1',

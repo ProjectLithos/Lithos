@@ -3,7 +3,7 @@
 static unsigned char TemplateBootstrapHeap[256U * 1024U] __attribute__((aligned(4096)));
 static unsigned char TemplatePermanentHeap[1024U * 1024U] __attribute__((aligned(4096)));
 
-typedef struct __attribute__((packed)) TemplateMultibootInformation
+typedef struct TemplateMultibootInformation
 {
     uint32_t Flags;
     uint32_t MemoryLowerKilobytes;
