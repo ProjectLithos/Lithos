@@ -217,3 +217,6 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [`OESDK_VIRTUAL_FLAG_GLOBAL`](OESDK_VIRTUAL_FLAG_GLOBAL.md)
 
 - [`OESDK_VIRTUAL_FLAG_NO_EXECUTE`](OESDK_VIRTUAL_FLAG_NO_EXECUTE.md)
+
+- [`OesdkVirtualAddressDecode`](OesdkVirtualAddressDecode.md)
+- [`OesdkVirtualAddressParts`](OesdkVirtualAddressParts.md)

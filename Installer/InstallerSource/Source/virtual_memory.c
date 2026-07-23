@@ -69,7 +69,21 @@ bool OesdkVirtualAddressIsCanonical(uintptr_t VirtualAddress)
 {
     uint64_t Value = (uint64_t)VirtualAddress;
     uint64_t Upper = Value >> 48U;
-    return ((Value & (1ULL << 47U)) == 0U) ? Upper == 0U : Upper == 0xFFFFU;
+    return ((Value & (1ULL << OESDK_X86_64_CANONICAL_BIT)) == 0U) ? Upper == 0U : Upper == 0xFFFFU;
+}
+
+void OesdkVirtualAddressDecode(uintptr_t VirtualAddress, OesdkVirtualAddressParts *Parts)
+{
+    uint64_t Value;
+    if (Parts == NULL) return;
+    Value = (uint64_t)VirtualAddress;
+    Parts->Pml4Index = (uint16_t)((Value >> OESDK_X86_64_PML4_SHIFT) & OESDK_X86_64_INDEX_MASK);
+    Parts->PdptIndex = (uint16_t)((Value >> OESDK_X86_64_PDPT_SHIFT) & OESDK_X86_64_INDEX_MASK);
+    Parts->PdIndex = (uint16_t)((Value >> OESDK_X86_64_PD_SHIFT) & OESDK_X86_64_INDEX_MASK);
+    Parts->PtIndex = (uint16_t)((Value >> OESDK_X86_64_PT_SHIFT) & OESDK_X86_64_INDEX_MASK);
+    Parts->Offset = (uint16_t)(Value & OESDK_X86_64_OFFSET_MASK);
+    Parts->UpperHalf = (Value & (1ULL << OESDK_X86_64_CANONICAL_BIT)) != 0U;
+    Parts->Canonical = OesdkVirtualAddressIsCanonical(VirtualAddress);
 }
 
 static uint64_t LeafFlags(OesdkVirtualFlags Flags)
@@ -131,10 +145,11 @@ static OesdkStatus SplitTwoMibEntry(uint64_t *Entry)
 
 static OesdkStatus GetLeaf(uintptr_t VirtualAddress, OesdkVirtualFlags Flags, bool Create, uint64_t **Leaf)
 {
-    unsigned int Pml4Index = (unsigned int)(((uint64_t)VirtualAddress >> 39U) & 0x1FFU);
-    unsigned int PdptIndex = (unsigned int)(((uint64_t)VirtualAddress >> 30U) & 0x1FFU);
-    unsigned int PdIndex = (unsigned int)(((uint64_t)VirtualAddress >> 21U) & 0x1FFU);
-    unsigned int PtIndex = (unsigned int)(((uint64_t)VirtualAddress >> 12U) & 0x1FFU);
+    OesdkVirtualAddressParts AddressParts;
+    unsigned int Pml4Index;
+    unsigned int PdptIndex;
+    unsigned int PdIndex;
+    unsigned int PtIndex;
     OesdkPageTable *Pml4 = Root;
     OesdkPageTable *Pdpt;
     OesdkPageTable *Pd;
@@ -143,6 +158,12 @@ static OesdkStatus GetLeaf(uintptr_t VirtualAddress, OesdkVirtualFlags Flags, bo
     uint64_t Physical;
     uint64_t Parent = ParentFlags(Flags);
     if (Leaf == NULL || Root == NULL) return OESDK_STATUS_INVALID_ARGUMENT;
+    OesdkVirtualAddressDecode(VirtualAddress, &AddressParts);
+    if (!AddressParts.Canonical) return OESDK_STATUS_INVALID_ARGUMENT;
+    Pml4Index = AddressParts.Pml4Index;
+    PdptIndex = AddressParts.PdptIndex;
+    PdIndex = AddressParts.PdIndex;
+    PtIndex = AddressParts.PtIndex;
 
     if (((*Pml4)[Pml4Index] & ENTRY_PRESENT) == 0U)
     {
@@ -259,6 +280,7 @@ OesdkStatus OesdkVirtualUnmap(uintptr_t VirtualAddress, size_t PageCount)
 
 bool OesdkVirtualTranslate(uintptr_t VirtualAddress, uintptr_t *PhysicalAddress)
 {
+    OesdkVirtualAddressParts AddressParts;
     unsigned int Pml4Index;
     unsigned int PdptIndex;
     unsigned int PdIndex;
@@ -268,10 +290,11 @@ bool OesdkVirtualTranslate(uintptr_t VirtualAddress, uintptr_t *PhysicalAddress)
     OesdkPageTable *Pt;
     uint64_t Entry;
     if (!Information.Initialized || PhysicalAddress == NULL || !OesdkVirtualAddressIsCanonical(VirtualAddress)) return false;
-    Pml4Index = (unsigned int)(((uint64_t)VirtualAddress >> 39U) & 0x1FFU);
-    PdptIndex = (unsigned int)(((uint64_t)VirtualAddress >> 30U) & 0x1FFU);
-    PdIndex = (unsigned int)(((uint64_t)VirtualAddress >> 21U) & 0x1FFU);
-    PtIndex = (unsigned int)(((uint64_t)VirtualAddress >> 12U) & 0x1FFU);
+    OesdkVirtualAddressDecode(VirtualAddress, &AddressParts);
+    Pml4Index = AddressParts.Pml4Index;
+    PdptIndex = AddressParts.PdptIndex;
+    PdIndex = AddressParts.PdIndex;
+    PtIndex = AddressParts.PtIndex;
     Entry = (*Root)[Pml4Index];
     if ((Entry & ENTRY_PRESENT) == 0U) return false;
     Pdpt = PhysicalTable(Entry);
