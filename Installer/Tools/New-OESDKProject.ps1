@@ -60,7 +60,7 @@ $projectXml = @'
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">__INTELLISENSE__=1;DEBUG=1__PROJECT_DEFINITION__</NMakePreprocessorDefinitions>
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Release'">__INTELLISENSE__=1__PROJECT_DEFINITION__</NMakePreprocessorDefinitions>
     <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\Run-Qemu.ps1&quot; -Kernel &quot;$(ProjectDir)Build\$(Configuration)\kernel.elf&quot;</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-NoLogo -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\VisualStudio-Launch.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot;</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup><ClCompile Include="Source\kmain.c" /></ItemGroup>

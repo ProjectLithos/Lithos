@@ -1,4 +1,4 @@
-# OESDK 0.17.30
+# OESDK 0.17.31
 
 - Added legacy PIC remapping, masking, unmasking and correct EOI handling.
 - Added Local APIC and x2APIC controller initialization and EOI support.

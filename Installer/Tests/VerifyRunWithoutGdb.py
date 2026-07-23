@@ -7,6 +7,10 @@ for relative in (
     "Packages/VisualStudio/Templates/Desktop/OESDKDesktop.vcxproj",
 ):
     text = (ROOT / relative).read_text(encoding="utf-8")
-    assert "$(ProjectDir)Run-Kernel.cmd" in text, relative
+    assert "VisualStudio-Launch.ps1" in text, relative
     assert "$(ProjectDir)Debug-Kernel.cmd" not in text, relative
-print("[ OK ] Normal Visual Studio run path does not launch GDB.")
+launcher = (ROOT / "Tools/VisualStudio-Launch.ps1").read_text(encoding="utf-8")
+assert "IsDebuggerPresent" in launcher
+assert "Run-Kernel.ps1" in launcher
+assert "Debug-Kernel.ps1" in launcher
+print("[ OK ] F5 and Ctrl+F5 are separated by the OESDK Visual Studio launcher.")
