@@ -97,8 +97,8 @@ void kmain(int argc, char *argv)
     $source = @'
 #include <oesdk/kernel.h>
 
-_Alignas(4096) static unsigned char TemplateBootstrapHeap[256U * 1024U];
-_Alignas(4096) static unsigned char TemplatePermanentHeap[1024U * 1024U];
+static unsigned char TemplateBootstrapHeap[256U * 1024U];
+static unsigned char TemplatePermanentHeap[1024U * 1024U];
 
 typedef struct TemplateMultibootInformation
 {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.26",
+  "sdkVersion": "0.17.27",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.26",
+  "packageRevision": "0.17.27",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -96,7 +96,7 @@
     "virtualMemory": "Docs/Virtual-Memory.md",
     "timer": "Docs/Timer.md"
   },
-  "visualStudioSdkVersion": "0.17.26",
+  "visualStudioSdkVersion": "0.17.27",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
