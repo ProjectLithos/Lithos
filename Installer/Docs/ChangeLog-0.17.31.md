@@ -1,4 +1,4 @@
-# OESDK 0.17.31
+# OESDK 0.17.32
 
 ## Visual Studio toolbar launch behaviour
 

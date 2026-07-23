@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.31",
+  "sdkVersion": "0.17.32",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.31",
+  "packageRevision": "0.17.32",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -72,7 +72,9 @@
       "hostio-setfs",
       "verbose-resume",
       "noack"
-    ]
+    ],
+    "visualStudioLauncherLog": "Build/<Configuration>/oesdk-visualstudio-launch.log",
+    "launcherFailurePause": true
   },
   "templatesRemoved": [
     "*Oryn*"
@@ -95,7 +97,7 @@
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md"
   },
-  "visualStudioSdkVersion": "0.17.31",
+  "visualStudioSdkVersion": "0.17.32",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
