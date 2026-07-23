@@ -3,6 +3,7 @@
 #include <oesdk/console.h>
 #include <oesdk/gdt.h>
 #include <oesdk/interrupt.h>
+#include <oesdk/interrupt_controller.h>
 #include <oesdk/panic.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -186,10 +187,18 @@ void OesdkInterruptDispatch(OesdkInterruptFrame *Frame) {
     OesdkHandlerSlot Slot = OesdkHandlers[Frame->Vector];
     if (Slot.Handler != NULL) {
         Slot.Handler(Frame, Slot.Context);
+        if (OesdkInterruptControllerOwnsVector((uint8_t)Frame->Vector)) {
+            OesdkInterruptControllerEndOfInterrupt((uint8_t)Frame->Vector);
+        }
         return;
     }
 
-    if (Frame->Vector >= OESDK_EXCEPTION_VECTOR_COUNT) return;
+    if (Frame->Vector >= OESDK_EXCEPTION_VECTOR_COUNT) {
+        if (OesdkInterruptControllerOwnsVector((uint8_t)Frame->Vector)) {
+            OesdkInterruptControllerEndOfInterrupt((uint8_t)Frame->Vector);
+        }
+        return;
+    }
 
     switch (Frame->Vector) {
         case 0U: OesdkDivideErrorHandler(Frame); break;

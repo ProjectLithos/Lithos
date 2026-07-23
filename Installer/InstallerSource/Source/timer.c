@@ -1,6 +1,7 @@
 #include <oesdk/timer.h>
 #include <oesdk/cpu.h>
 #include <oesdk/interrupt.h>
+#include <oesdk/interrupt_controller.h>
 
 #define OESDK_PIT_CHANNEL0_PORT 0x40U
 #define OESDK_PIT_COMMAND_PORT 0x43U
@@ -89,6 +90,13 @@ OesdkStatus OesdkTimerInitializePit(uint32_t DesiredHz, uint8_t Vector)
     OesdkTimerState.RequestedHz = DesiredHz;
     OesdkTimerState.ActualHz = OESDK_PIT_BASE_FREQUENCY / Divisor;
     OesdkTimerState.Divisor = Divisor;
+    if (Vector == OESDK_PIC_VECTOR_BASE) {
+        Status = OesdkInterruptControllerUnmaskIrq(0U);
+        if (OESDK_FAILED(Status)) {
+            OesdkTimerStop();
+            return Status;
+        }
+    }
     return OESDK_STATUS_SUCCESS;
 }
 
@@ -157,7 +165,9 @@ OesdkStatus OesdkTimerInitializeHpet(uintptr_t HpetBase, uint32_t DesiredHz, uin
 void OesdkTimerStop(void)
 {
     if (!OesdkTimerState.Initialized) return;
-    if (OesdkTimerState.Source == OesdkTimerSourceLocalApic) {
+    if (OesdkTimerState.Source == OesdkTimerSourcePit) {
+        (void)OesdkInterruptControllerMaskIrq(0U);
+    } else if (OesdkTimerState.Source == OesdkTimerSourceLocalApic) {
         OesdkTimerMmioWrite32(OesdkTimerState.HardwareBase + OESDK_APIC_LVT_TIMER_OFFSET,
                               OESDK_APIC_LVT_MASKED | OesdkTimerState.Vector);
         OesdkTimerMmioWrite32(OesdkTimerState.HardwareBase + OESDK_APIC_INITIAL_COUNT_OFFSET, 0U);

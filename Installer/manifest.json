@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.28",
+  "sdkVersion": "0.17.29",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.28",
+  "packageRevision": "0.17.29",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -94,9 +94,10 @@
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md",
-    "timer": "Docs/Timer.md"
+    "timer": "Docs/Timer.md",
+    "interruptControllerAndTimer": "Docs/Interrupt-Controller-and-Timer.md"
   },
-  "visualStudioSdkVersion": "0.17.28",
+  "visualStudioSdkVersion": "0.17.29",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -207,6 +208,16 @@
     "pitBaseFrequencyHz": 1193182,
     "defaultVector": 32,
     "overflowSafeConversions": true,
-    "interruptControllerRoutingRequired": true
+    "interruptControllerRoutingRequired": false,
+    "runtimePitHz": 100
+  },
+  "interruptController": {
+    "bootstrap": "pic",
+    "picVectors": "32-47",
+    "maskAllInitially": true,
+    "automaticEoi": true,
+    "localApic": true,
+    "x2Apic": true,
+    "ioApicRouting": true
   }
 }

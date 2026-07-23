@@ -256,3 +256,33 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [`OesdkTimerTicksToSeconds`](OesdkTimerTicksToSeconds.md)
 - [`OesdkTimerTicksToMilliseconds`](OesdkTimerTicksToMilliseconds.md)
 - [`OesdkTimerTicksToNanoseconds`](OesdkTimerTicksToNanoseconds.md)
+
+- [`OesdkInterruptControllerType`](OesdkInterruptControllerType.md)
+
+- [`OesdkInterruptControllerInformation`](OesdkInterruptControllerInformation.md)
+
+- [`OesdkInterruptControllerInitializePic`](OesdkInterruptControllerInitializePic.md)
+
+- [`OesdkInterruptControllerInitializeLocalApic`](OesdkInterruptControllerInitializeLocalApic.md)
+
+- [`OesdkInterruptControllerInitializeX2Apic`](OesdkInterruptControllerInitializeX2Apic.md)
+
+- [`OesdkInterruptControllerAttachIoApic`](OesdkInterruptControllerAttachIoApic.md)
+
+- [`OesdkInterruptControllerRouteIrq`](OesdkInterruptControllerRouteIrq.md)
+
+- [`OesdkInterruptControllerMaskIrq`](OesdkInterruptControllerMaskIrq.md)
+
+- [`OesdkInterruptControllerUnmaskIrq`](OesdkInterruptControllerUnmaskIrq.md)
+
+- [`OesdkInterruptControllerEndOfInterrupt`](OesdkInterruptControllerEndOfInterrupt.md)
+
+- [`OesdkInterruptControllerOwnsVector`](OesdkInterruptControllerOwnsVector.md)
+
+- [`OesdkInterruptControllerInformationGet`](OesdkInterruptControllerInformationGet.md)
+
+- [`OESDK_IOAPIC_POLARITY_LOW`](OESDK_IOAPIC_POLARITY_LOW.md)
+
+- [`OESDK_IOAPIC_TRIGGER_LEVEL`](OESDK_IOAPIC_TRIGGER_LEVEL.md)
+
+- [`OESDK_IOAPIC_MASKED`](OESDK_IOAPIC_MASKED.md)

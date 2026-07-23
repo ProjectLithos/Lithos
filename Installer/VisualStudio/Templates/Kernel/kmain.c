@@ -229,14 +229,27 @@ static void DemonstrateInterruptApi(void)
 
 static void DemonstrateTimerMath(void)
 {
+    const OesdkInterruptControllerInformation *Controller = OesdkInterruptControllerInformationGet();
+    const OesdkTimerInformation *Timer = OesdkTimerInformationGet();
     const uint32_t Hz = 100U;
     const uint64_t Ticks = 250U;
+    OESDK_ASSERT(Controller != NULL && Controller->Initialized);
+    OESDK_ASSERT(Timer != NULL && Timer->Initialized);
+    kprintf("Interrupt controller: type=%u vector-base=%u\n",
+            (unsigned int)Controller->Type,
+            (unsigned int)Controller->VectorBase);
+    kprintf("Timer: source=%u requested=%u actual=%u vector=%u ticks=%llu\n",
+            (unsigned int)Timer->Source,
+            (unsigned int)Timer->RequestedHz,
+            (unsigned int)Timer->ActualHz,
+            (unsigned int)Timer->Vector,
+            (unsigned long long)OesdkTimerTicks());
     kprintf("Timer conversion: %llu ticks at %u Hz = %llu ms, %llu ns\n",
             (unsigned long long)Ticks,
             (unsigned int)Hz,
             (unsigned long long)OesdkTimerTicksToMilliseconds(Ticks, Hz),
             (unsigned long long)OesdkTimerTicksToNanoseconds(Ticks, Hz));
-    kprintf("Timer backends: PIT, Local APIC, x2APIC, HPET. Routing is controller-owned.\n");
+    kprintf("Timer backends: PIT, Local APIC, x2APIC, HPET. IRQ routing and EOI are active.\n");
 }
 
 static void DemonstrateGraphics(void)

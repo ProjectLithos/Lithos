@@ -4,6 +4,8 @@
 #include <oesdk/cpu.h>
 #include <oesdk/gdt.h>
 #include <oesdk/interrupt.h>
+#include <oesdk/interrupt_controller.h>
+#include <oesdk/timer.h>
 
 extern void kmain(int argc, char *argv);
 
@@ -26,6 +28,17 @@ __attribute__((noreturn)) void oesdk_runtime_start(uint32_t multiboot_magic, uin
     }
     oesdk_console_initialize();
     oesdk_graphics_initialize(multiboot_magic, multiboot_information);
+    {
+        OesdkStatus Status = OesdkInterruptControllerInitializePic(OESDK_PIC_VECTOR_BASE);
+        if (OESDK_FAILED(Status)) {
+            OesdkPanic("InterruptController", "PIC initialization failed", 0x0000000000000014ULL);
+        }
+        Status = OesdkTimerInitializePit(100U, OESDK_TIMER_DEFAULT_VECTOR);
+        if (OESDK_FAILED(Status)) {
+            OesdkPanic("Timer", "PIT initialization failed", 0x0000000000000015ULL);
+        }
+        OesdkCpuEnableInterrupts();
+    }
     kmain(0, NULL);
     kdebugf("OESDK: kmain returned; the CPU will halt.\n");
     for (;;) __asm__ volatile ("cli; hlt");
