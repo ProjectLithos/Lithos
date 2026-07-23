@@ -1,26 +1,12 @@
-# OESDK Base Kernel Template
+# OESDK Template Kernel
 
-This native Clang C template demonstrates every core service currently linked by
-OESDK 0.17.17. The OESDK runtime initializes the serial port, CPU feature layer,
-kernel-owned GDT/TSS, IDT, boot context, console and graphics surface before
-calling `kmain`.
+The template keeps `kmain.c` as a small startup coordinator and separates SDK integration into focused usage files:
 
-The generated `Source/kmain.c` then demonstrates:
+- `UsageBoot.c` — boot context and memory-map normalisation
+- `UsageCpu.c` — CPU, GDT, IDT and SMP status
+- `UsageMemory.c` — physical memory, virtual memory and heaps
+- `UsageInterrupts.c` — interrupt handlers, controller and timer APIs
+- `UsageObjects.c` — scheduler status, capabilities, channels, endpoints and events
+- `UsageGraphics.c` — optional framebuffer drawing
 
-- package and boot-context version information;
-- screen console and COM1 debug output;
-- CPU feature discovery and CPUID queries;
-- GDT/TSS and IDT information;
-- status names, descriptions and success/failure checks;
-- safe interrupt-handler registration and removal;
-- Multiboot 1 memory-map normalisation and range validation;
-- panic and assertion contracts;
-- framebuffer detection, pixel and rectangle drawing;
-- interrupt-state save/restore and the CPU pause primitive.
-
-The template deliberately does not trigger a CPU exception or panic, enable an
-interrupt controller, or initialize the optional separately built Newlib target.
-Those operations require project-specific policy or additional subsystems.
-
-Build Debug or Release in Visual Studio, then press F5 or use Start Without Debugging to
-launch `kernel.elf` in QEMU. Debug builds send `kdebugf` output to COM1.
+Subsystems that require project-specific policy or firmware data are detected and reported rather than started with invented configuration. This includes AP topology, process address-space roots, ELF images, syscall namespaces and user-mode entry points.

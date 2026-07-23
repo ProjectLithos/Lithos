@@ -35,7 +35,16 @@
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">__INTELLISENSE__=1;DEBUG=1</NMakePreprocessorDefinitions>
     <NMakePreprocessorDefinitions Condition="'$(Configuration)'=='Release'">__INTELLISENSE__=1</NMakePreprocessorDefinitions>
 </PropertyGroup>
-  <ItemGroup><ClCompile Include="Source\kmain.c" /></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\kmain.c" />
+    <ClCompile Include="Source\UsageBoot.c" />
+    <ClCompile Include="Source\UsageCpu.c" />
+    <ClCompile Include="Source\UsageMemory.c" />
+    <ClCompile Include="Source\UsageInterrupts.c" />
+    <ClCompile Include="Source\UsageObjects.c" />
+    <ClCompile Include="Source\UsageGraphics.c" />
+    <ClInclude Include="Source\Usage.h" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>powershell.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-NoLogo -NoProfile -ExecutionPolicy Bypass -File &quot;$(OESDK_ROOT)\Tools\VisualStudio-Launch.ps1&quot; -ProjectRoot &quot;$(ProjectDir).&quot; -Configuration &quot;$(Configuration)&quot;</LocalDebuggerCommandArguments>

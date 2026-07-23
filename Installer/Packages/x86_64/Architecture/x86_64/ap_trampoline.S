@@ -9,5 +9,5 @@
 .global oesdk_ap_trampoline_contract
 .type oesdk_ap_trampoline_contract, @object
 oesdk_ap_trampoline_contract:
-    .ascii "OESDK-AP-TRAMPOLINE-0.18.1\0"
+    .ascii "OESDK-AP-TRAMPOLINE-0.18.2\0"
 .size oesdk_ap_trampoline_contract, .-oesdk_ap_trampoline_contract

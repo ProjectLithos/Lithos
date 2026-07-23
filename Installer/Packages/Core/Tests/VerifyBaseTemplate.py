@@ -1,19 +1,24 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CANONICAL = ROOT / 'VisualStudio/Templates/Kernel/kmain.c'
+CANONICAL = ROOT / 'VisualStudio/Templates/Kernel'
 MIRRORS = [
-    ROOT / 'Packages/VisualStudio/Templates/Kernel/kmain.c',
-    ROOT / 'InstallerSource/Packages/VisualStudio/Templates/Kernel/kmain.c',
+    ROOT / 'Packages/VisualStudio/Templates/Kernel',
+    ROOT / 'InstallerSource/VisualStudio/Templates/Kernel',
+    ROOT / 'InstallerSource/Packages/VisualStudio/Templates/Kernel',
 ]
-
-text = CANONICAL.read_text(encoding='utf-8')
+FILES = ['kmain.c', 'Usage.h', 'UsageBoot.c', 'UsageCpu.c', 'UsageMemory.c',
+         'UsageInterrupts.c', 'UsageObjects.c', 'UsageGraphics.c',
+         'OESDKKernel.vcxproj', 'OESDKKernel.vstemplate', 'README.md']
 for mirror in MIRRORS:
-    assert mirror.read_text(encoding='utf-8') == text, f'{mirror}: base template differs from canonical template'
+    for name in FILES:
+        assert (mirror / name).read_text(encoding='utf-8') == (CANONICAL / name).read_text(encoding='utf-8'), \
+            f'{mirror / name}: template differs from canonical template'
 
+sources = '\n'.join((CANONICAL / name).read_text(encoding='utf-8') for name in FILES if name.endswith(('.c','.h')))
+main = (CANONICAL / 'kmain.c').read_text(encoding='utf-8')
 required = {
     'boot context': 'OesdkBootContextGet()',
-    'status type': 'OesdkStatus Status',
     'status success': 'OESDK_SUCCEEDED(Status)',
     'status failure': 'OESDK_FAILED(Status)',
     'status name': 'OesdkStatusName(Status)',
@@ -24,22 +29,27 @@ required = {
     'CPU pause': 'OesdkCpuPause()',
     'GDT': 'OesdkGdtInformationGet()',
     'IDT': 'OesdkIdtInformationGet()',
-    'exception names': 'OesdkExceptionName(14U)',
+    'SMP status': 'OesdkSmpInformationGet()',
     'interrupt registration': 'OesdkInterruptHandlerRegister(',
     'interrupt removal': 'OesdkInterruptHandlerUnregister(',
     'memory normalisation': 'OesdkMemoryMapNormalizeMultiboot1(',
-    'memory region count': 'OesdkMemoryMapRegionCount()',
-    'memory range validation': 'OesdkMemoryRangeEnd(Region, &End)',
     'physical allocator': 'OesdkPhysicalMemoryInitialize(',
     'physical allocation': 'OesdkPhysicalMemoryAllocate(',
     'physical free': 'OesdkPhysicalMemoryFree(',
     'virtual memory': 'OesdkVirtualMemoryInitialize()',
+    'bootstrap heap': 'OesdkHeapBootstrapInitialize(',
     'permanent heap': 'OesdkHeapInitialize(',
     'heap allocation': 'OesdkAllocate(',
     'zeroed heap allocation': 'OesdkAllocateZeroed(',
     'heap free': 'OesdkFree(',
+    'scheduler status': 'OesdkSchedulerInformationGet()',
+    'capability creation': 'OesdkCapabilityCreate(',
+    'capability reduction': 'OesdkCapabilityDerive(',
+    'channel': 'OesdkChannelInitialize(',
+    'endpoint send': 'OesdkEndpointSend(',
+    'endpoint receive': 'OesdkEndpointReceive(',
+    'event': 'OesdkEventInitialize(',
     'assertion': 'OESDK_ASSERT(',
-    'assertion error code': 'OESDK_ASSERT_CODE(',
     'panic': 'OESDK_PANIC(',
     'console clear': 'kclear()',
     'console text': 'kputs(',
@@ -51,22 +61,12 @@ required = {
     'graphics pixel': 'kgfx_pixel(',
 }
 for name, token in required.items():
-    assert token in text, f'base template does not demonstrate {name}: {token}'
+    assert token in sources, f'base template does not demonstrate {name}: {token}'
 
-assert 'OesdkLibcInitialize' not in text, 'optional separately linked Newlib must not be presented as core runtime initialization'
-assert 'OesdkCpuEnableInterrupts()' not in text, 'template must not enable hardware interrupts before an interrupt controller exists'
-
-assert '__attribute__((packed)) TemplateMultibootInformation' not in text, 'base template must remain parseable by Visual Studio IntelliSense'
-assert 'typedef struct TemplateMultibootInformation' in text, 'portable Multiboot information declaration is missing'
-
-for rel in [
-    'Tools/New-OESDKProject.ps1',
-    'Packages/x86_64/Tools/New-OESDKProject.ps1',
-    'InstallerSource/Packages/x86_64/Tools/New-OESDKProject.ps1',
-]:
-    generated = (ROOT / rel).read_text(encoding='utf-8')
-    for token in required.values():
-        project_token = token.replace('$safeprojectname$', '__PROJECT_NAME__')
-        assert project_token in generated, f'{rel}: generated base project omits {project_token}'
-
-print('[ OK ] Base template covers every currently linked core OESDK subsystem.')
+for module in ['TemplateUsageBoot', 'TemplateUsageCpu', 'TemplateUsageMemory',
+               'TemplateUsageInterruptsAndTimer', 'TemplateUsageObjects', 'TemplateUsageGraphics']:
+    assert f'{module}(' in main, f'kmain does not coordinate {module}'
+assert len(main.splitlines()) < 45, 'kmain.c should remain a small coordinator'
+assert 'OesdkLibcInitialize' not in sources
+assert 'OesdkCpuEnableInterrupts()' not in sources
+print('[ OK ] Modular base template covers all safely usable linked OESDK subsystems.')

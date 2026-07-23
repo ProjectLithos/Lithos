@@ -1,6 +1,6 @@
 # SMP Startup
 
-OESDK 0.18.1 adds reusable x86-64 symmetric multiprocessing startup support while retaining safe single-CPU fallback.
+OESDK 0.18.2 adds reusable x86-64 symmetric multiprocessing startup support while retaining safe single-CPU fallback.
 
 The boot processor supplies enabled APIC IDs discovered from ACPI MADT or equivalent firmware data. OESDK assigns stable logical IDs, distinguishes the bootstrap processor from application processors, and records each processor as Discovered, Prepared, Starting, Online, or Failed.
 
