@@ -6,7 +6,7 @@
     {
       "name": "OESDK Core",
       "path": "ReleaseAssets/OESDK-Core-0.18.0.zip",
-      "sha256": "66ACF3E22E014FDFF0A57BE39BB08D4F5B27FCD642BFD2B692213F463D600589",
+      "sha256": "057EE128CA96DBBC023502339919BF49F92890FBD4E99B4105490585637AFEFB",
       "destination": "."
     },
     {

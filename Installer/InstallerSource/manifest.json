@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.36",
+  "sdkVersion": "0.18.0",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.36.0",
+  "packageRevision": "0.18.0.0",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -101,7 +101,7 @@
     "threadsAndScheduler": "Docs/Threads-and-Scheduler.md",
     "processesUserModeSyscallsIpc": "Docs/Processes-User-Mode-System-Calls-IPC.md"
   },
-  "visualStudioSdkVersion": "0.17.36",
+  "visualStudioSdkVersion": "0.18.0",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -239,8 +239,8 @@
     "timerTickAccounting": true,
     "architectureContext": "x86_64"
   },
-  "sdkIdentity": "0.17.36",
-  "packageIdentity": "0.17.36.0",
+  "sdkIdentity": "0.18.0",
+  "packageIdentity": "0.18.0.0",
   "architectureSelection": {
     "profiles": {
       "Monolithic": {

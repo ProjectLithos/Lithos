@@ -1,6 +1,6 @@
 # Processes, User Mode, System Calls, IPC and Capabilities
 
-OESDK 0.17.36 introduces reusable process and user-mode foundations without forcing a monolithic, microkernel, or hybrid architecture.
+OESDK 0.18.0 introduces reusable process and user-mode foundations without forcing a monolithic, microkernel, or hybrid architecture.
 
 ## Security invariants
 

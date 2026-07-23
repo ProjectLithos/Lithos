@@ -1,4 +1,4 @@
-# OESDK 0.17.36
+# OESDK 0.18.0
 
 - Added process records, per-process address-space mapping metadata, user stacks and termination.
 - Added strict user-pointer and user-range validation.
