@@ -1,0 +1,3 @@
+#include <stddef.h>
+#include <oesdk/capability.h>
+static uint64_t NextId=1U;OesdkStatus OesdkCapabilityCreate(void*O,OesdkRights R,OesdkCapability*C){if(O==NULL||C==NULL)return OESDK_STATUS_INVALID_ARGUMENT;*C=(OesdkCapability){NextId++,O,R,true};return OESDK_STATUS_SUCCESS;}OesdkStatus OesdkCapabilityDerive(const OesdkCapability*P,OesdkRights R,OesdkCapability*C){if(P==NULL||C==NULL||!P->Active)return OESDK_STATUS_INVALID_ARGUMENT;return OesdkCapabilityCreate(P->Object,P->Rights&R,C);}bool OesdkCapabilityAllows(const OesdkCapability*C,OesdkRights R){return C!=NULL&&C->Active&&(C->Rights&R)==R;}

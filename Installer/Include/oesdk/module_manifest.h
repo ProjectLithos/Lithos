@@ -1,0 +1,5 @@
+#ifndef OESDK_MODULE_MANIFEST_H
+#define OESDK_MODULE_MANIFEST_H
+typedef enum OesdkModuleMode { OesdkModuleModeKernel=0,OesdkModuleModeUser,OesdkModuleModeExcluded,OesdkModuleModeAutomatic } OesdkModuleMode;
+typedef enum OesdkKernelArchitecture { OesdkKernelArchitectureMonolithic=0,OesdkKernelArchitectureMicrokernel,OesdkKernelArchitectureHybrid } OesdkKernelArchitecture;
+#endif

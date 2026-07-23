@@ -29,13 +29,17 @@ def verify() -> None:
     assert example["packageType"] == manifest["packageType"]
     assert example["containsCustomExecutable"] == manifest["containsCustomExecutable"]
     assert example["sdkVersion"] == version
-    assert example.get("packageRevision") == version
+    assert example.get("packageRevision") == version + ".0"
+    assert example.get("sdkIdentity") == version
+    assert example.get("packageIdentity") == version + ".0"
     for package in example["packages"]:
         assert "path" in package, "source-ready example package must use path"
         assert "url" not in package, "source-ready example must not require legacy URL packages"
     assert manifest["schemaVersion"] == 1
     assert manifest["sdkVersion"] == version
-    assert manifest["packageRevision"] == version
+    assert manifest["packageRevision"] == version + ".0"
+    assert manifest["sdkIdentity"] == version
+    assert manifest["packageIdentity"] == version + ".0"
     assert manifest["releaseStatus"] == "source-ready"
     assert manifest["packageType"] == "complete-script-only"
     assert manifest["containsCustomExecutable"] is False

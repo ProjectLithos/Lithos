@@ -6,7 +6,9 @@ version = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 major, minor, patch = (int(part) for part in version.split('.'))
 manifest = json.loads((ROOT / 'manifest.json').read_text(encoding='utf-8'))
 assert manifest['sdkVersion'] == version
-assert manifest['packageRevision'] == version
+assert manifest['packageRevision'] == version + '.0'
+assert manifest['sdkIdentity'] == version
+assert manifest['packageIdentity'] == version + '.0'
 assert manifest['visualStudioSdkVersion'] == version
 expected = {'MAJOR': major, 'MINOR': minor, 'PATCH': patch, 'REVISION': 0}
 for rel in ('Include/oesdk/kernel.h','Packages/Core/Include/oesdk/kernel.h','InstallerSource/Packages/Core/Include/oesdk/kernel.h'):
