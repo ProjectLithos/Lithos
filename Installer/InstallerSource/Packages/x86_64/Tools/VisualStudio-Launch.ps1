@@ -41,10 +41,10 @@ try {
         Add-Type -TypeDefinition @'
 using System.Runtime.InteropServices;
 namespace Oesdk {
-    internal static class NativeDebuggerProbe {
+    public static class NativeDebuggerProbe {
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool IsDebuggerPresent();
+        public static extern bool IsDebuggerPresent();
     }
 }
 '@
