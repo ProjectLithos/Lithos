@@ -250,6 +250,10 @@ static void DemonstratePhysicalMemory(const OesdkBootContext *BootContext)
     kprintf("Physical allocator: %s\n", OesdkStatusName(Status));
     if (OESDK_FAILED(Status)) return;
 
+    Status = OesdkVirtualMemoryInitialize();
+    kprintf("Virtual memory: %s\n", OesdkStatusName(Status));
+    OESDK_ASSERT(OESDK_SUCCEEDED(Status));
+
     Memory = OesdkPhysicalMemoryInformationGet();
     OESDK_ASSERT(Memory != NULL);
     kprintf("Physical pages: total=%llu free=%llu reserved=%llu bitmap=%llu bytes\n",

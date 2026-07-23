@@ -33,6 +33,7 @@ required = {
     'physical allocator': 'OesdkPhysicalMemoryInitialize(',
     'physical allocation': 'OesdkPhysicalMemoryAllocate(',
     'physical free': 'OesdkPhysicalMemoryFree(',
+    'virtual memory': 'OesdkVirtualMemoryInitialize()',
     'assertion': 'OESDK_ASSERT(',
     'assertion error code': 'OESDK_ASSERT_CODE(',
     'panic': 'OESDK_PANIC(',

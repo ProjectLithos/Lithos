@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.17",
+  "sdkVersion": "0.17.18",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.17",
+  "packageRevision": "0.17.18",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -87,9 +87,10 @@
     "apiReference": "Docs/API/README.md",
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
-    "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md"
+    "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
+    "virtualMemory": "Docs/Virtual-Memory.md"
   },
-  "visualStudioSdkVersion": "0.17.17",
+  "visualStudioSdkVersion": "0.17.18",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -167,6 +168,19 @@
       "memory-map-storage",
       "framebuffer",
       "allocator-bitmaps"
+    ]
+  },
+  "virtualMemory": {
+    "architecture": "x86_64",
+    "pageSize": 4096,
+    "addressBits": 48,
+    "retainsBootstrapIdentityMap": true,
+    "supports": [
+      "map",
+      "unmap",
+      "translate",
+      "2MiB-split",
+      "nx"
     ]
   }
 }

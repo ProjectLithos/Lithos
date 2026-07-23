@@ -183,3 +183,37 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [`OesdkMemoryMapRegions`](./OesdkMemoryMapRegions.md)
 
 - [`OesdkMemoryMapRegionCount`](./OesdkMemoryMapRegionCount.md)
+
+- [`OesdkVirtualFlags`](OesdkVirtualFlags.md)
+
+- [`OesdkVirtualMemoryInformation`](OesdkVirtualMemoryInformation.md)
+
+- [`OesdkVirtualAddressIsCanonical`](OesdkVirtualAddressIsCanonical.md)
+
+- [`OesdkVirtualMemoryInitialize`](OesdkVirtualMemoryInitialize.md)
+
+- [`OesdkVirtualMap`](OesdkVirtualMap.md)
+
+- [`OesdkVirtualUnmap`](OesdkVirtualUnmap.md)
+
+- [`OesdkVirtualTranslate`](OesdkVirtualTranslate.md)
+
+- [`OesdkVirtualMemoryIsInitialized`](OesdkVirtualMemoryIsInitialized.md)
+
+- [`OesdkVirtualMemoryInformationGet`](OesdkVirtualMemoryInformationGet.md)
+
+- [`OESDK_VIRTUAL_PAGE_MASK`](OESDK_VIRTUAL_PAGE_MASK.md)
+
+- [`OESDK_VIRTUAL_FLAG_PRESENT`](OESDK_VIRTUAL_FLAG_PRESENT.md)
+
+- [`OESDK_VIRTUAL_FLAG_WRITABLE`](OESDK_VIRTUAL_FLAG_WRITABLE.md)
+
+- [`OESDK_VIRTUAL_FLAG_USER`](OESDK_VIRTUAL_FLAG_USER.md)
+
+- [`OESDK_VIRTUAL_FLAG_WRITE_THROUGH`](OESDK_VIRTUAL_FLAG_WRITE_THROUGH.md)
+
+- [`OESDK_VIRTUAL_FLAG_CACHE_DISABLE`](OESDK_VIRTUAL_FLAG_CACHE_DISABLE.md)
+
+- [`OESDK_VIRTUAL_FLAG_GLOBAL`](OESDK_VIRTUAL_FLAG_GLOBAL.md)
+
+- [`OESDK_VIRTUAL_FLAG_NO_EXECUTE`](OESDK_VIRTUAL_FLAG_NO_EXECUTE.md)
