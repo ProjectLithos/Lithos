@@ -27,7 +27,7 @@ Individual subsystem headers can also be included directly.
 
 ## Build and debugging
 
-OESDK projects produce a symbol-rich `Build/Debug/kernel.elf`. Press F5 in a configured Visual Studio project to start QEMU and the interactive GDB session.
+OESDK projects produce a symbol-rich `Build/Debug/kernel.elf`. Press F5 or use Start Without Debugging to run QEMU normally without GDB. Run `Debug-Kernel.cmd` only when an interactive GDB session is required.
 
 ## Version
 

@@ -22,5 +22,5 @@ The template deliberately does not trigger a CPU exception or panic, enable an
 interrupt controller, or initialize the optional separately built Newlib target.
 Those operations require project-specific policy or additional subsystems.
 
-Build Debug or Release in Visual Studio, then use Start Without Debugging to
+Build Debug or Release in Visual Studio, then press F5 or use Start Without Debugging to
 launch `kernel.elf` in QEMU. Debug builds send `kdebugf` output to COM1.

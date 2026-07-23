@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.29",
+  "sdkVersion": "0.17.30",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.29",
+  "packageRevision": "0.17.30",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -58,7 +58,7 @@
     "qemuGdbServer": "127.0.0.1:1234",
     "script": "Tools/Debug-Kernel.ps1",
     "symbols": "Build/<Configuration>/kernel.elf",
-    "visualStudioF5Command": "cmd.exe /D /C call \"<ProjectDir>\\Debug-Kernel.cmd\"",
+    "visualStudioF5Command": "cmd.exe /D /C call \"<ProjectDir>\\Run-Kernel.cmd\"",
     "elfExecutedAsWin32": false,
     "fallbackDebugger": "Visual Studio LLDB",
     "diagnosticLog": "Build/Debug/oesdk-debug.log",
@@ -90,7 +90,7 @@
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
     "virtualMemory": "Docs/Virtual-Memory.md"
   },
-  "visualStudioSdkVersion": "0.17.29",
+  "visualStudioSdkVersion": "0.17.30",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,

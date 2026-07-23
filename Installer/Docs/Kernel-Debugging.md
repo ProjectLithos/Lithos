@@ -1,3 +1,9 @@
+
+## Normal run versus debugging
+
+Visual Studio F5 and Start Without Debugging launch `Run-Kernel.cmd`. This starts QEMU normally and does not start or connect GDB.
+
+To debug the guest kernel, run `Debug-Kernel.cmd` explicitly. That separate command starts QEMU paused with its GDB server and opens the interactive GDB console.
 # Running and debugging an OESDK kernel
 
 `powershell.exe` is not the debugger. It is the scripting host used to locate
