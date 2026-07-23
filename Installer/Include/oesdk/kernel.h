@@ -18,10 +18,11 @@
 #include <oesdk/physical_memory.h>
 #include <oesdk/virtual_memory.h>
 #include <oesdk/heap.h>
+#include <oesdk/timer.h>
 
 #define OESDK_VERSION_MAJOR 0
 #define OESDK_VERSION_MINOR 17
-#define OESDK_VERSION_PATCH 23
+#define OESDK_VERSION_PATCH 24
 #define OESDK_VERSION_REVISION 0
 
 #endif

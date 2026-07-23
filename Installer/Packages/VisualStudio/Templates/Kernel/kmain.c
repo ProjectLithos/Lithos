@@ -227,6 +227,18 @@ static void DemonstrateInterruptApi(void)
     }
 }
 
+static void DemonstrateTimerMath(void)
+{
+    const uint32_t Hz = 100U;
+    const uint64_t Ticks = 250U;
+    kprintf("Timer conversion: %llu ticks at %u Hz = %llu ms, %llu ns\n",
+            (unsigned long long)Ticks,
+            (unsigned int)Hz,
+            (unsigned long long)OesdkTimerTicksToMilliseconds(Ticks, Hz),
+            (unsigned long long)OesdkTimerTicksToNanoseconds(Ticks, Hz));
+    kprintf("Timer backends: PIT, Local APIC, x2APIC, HPET. Routing is controller-owned.\n");
+}
+
 static void DemonstrateGraphics(void)
 {
     if (!kgfx_available()) {
@@ -267,6 +279,7 @@ void kmain(int argc, char *argv)
     DemonstratePhysicalMemory(BootContext);
     DemonstrateKernelHeap();
     DemonstrateInterruptApi();
+    DemonstrateTimerMath();
     DemonstrateGraphics();
 
     SavedInterruptState = OesdkCpuInterruptStateSave();

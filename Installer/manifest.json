@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.17.23",
+  "sdkVersion": "0.17.24",
   "releaseStatus": "source-ready",
   "libc": {
     "implementation": "Newlib",
@@ -30,7 +30,7 @@
       "generatedAfterBuild": true
     }
   ],
-  "packageRevision": "0.17.23",
+  "packageRevision": "0.17.24",
   "packageType": "complete-script-only",
   "contains": [
     "full-source",
@@ -88,9 +88,10 @@
     "apiDocumentationVerification": "Tests/VerifyApiDocumentation.py",
     "memoryMapNormalization": "Docs/Memory-Map-Normalisation.md",
     "physicalPageAllocator": "Docs/Bitmap-Page-Frame-Allocator.md",
-    "virtualMemory": "Docs/Virtual-Memory.md"
+    "virtualMemory": "Docs/Virtual-Memory.md",
+    "timer": "Docs/Timer.md"
   },
-  "visualStudioSdkVersion": "0.17.23",
+  "visualStudioSdkVersion": "0.17.24",
   "exceptionsAndInterrupts": {
     "architecture": "x86_64",
     "idtVectors": 256,
@@ -190,5 +191,17 @@
     "contiguousCoalescing": true,
     "alignedAllocation": true,
     "zeroedAllocation": true
+  },
+  "timer": {
+    "sources": [
+      "pit",
+      "local-apic",
+      "x2apic",
+      "hpet"
+    ],
+    "pitBaseFrequencyHz": 1193182,
+    "defaultVector": 32,
+    "overflowSafeConversions": true,
+    "interruptControllerRoutingRequired": true
   }
 }

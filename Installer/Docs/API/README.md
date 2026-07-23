@@ -242,3 +242,17 @@ When a public API function, function-like macro, or type is added to `Include/oe
 - [OesdkHeapBlock](OesdkHeapBlock.md)
 - [OesdkHeapIsInitialized](OesdkHeapIsInitialized.md)
 - [OESDK_HEAP_DEFAULT_ALIGNMENT](OESDK_HEAP_DEFAULT_ALIGNMENT.md)
+## Timer
+
+- [`OesdkTimerSource`](OesdkTimerSource.md)
+- [`OesdkTimerInformation`](OesdkTimerInformation.md)
+- [`OesdkTimerInitializePit`](OesdkTimerInitializePit.md)
+- [`OesdkTimerInitializeLocalApic`](OesdkTimerInitializeLocalApic.md)
+- [`OesdkTimerInitializeX2Apic`](OesdkTimerInitializeX2Apic.md)
+- [`OesdkTimerInitializeHpet`](OesdkTimerInitializeHpet.md)
+- [`OesdkTimerStop`](OesdkTimerStop.md)
+- [`OesdkTimerInformationGet`](OesdkTimerInformationGet.md)
+- [`OesdkTimerTicks`](OesdkTimerTicks.md)
+- [`OesdkTimerTicksToSeconds`](OesdkTimerTicksToSeconds.md)
+- [`OesdkTimerTicksToMilliseconds`](OesdkTimerTicksToMilliseconds.md)
+- [`OesdkTimerTicksToNanoseconds`](OesdkTimerTicksToNanoseconds.md)
